@@ -1,0 +1,9 @@
+postgresql
+redis
+python3-venv
+python3-dev
+build-essential
+libraqm0
+fonts-crosextra-caladea
+fonts-freefont-ttf
+fonts-sil-gentium
