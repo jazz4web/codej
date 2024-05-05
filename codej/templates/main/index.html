@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/index.css',
+             'css/base.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+  <link rel="canonical" href="{{ url_for('index') }}">
+{%- endblock styles -%}
+
+{%- block page_body -%}
+    <div class="empty-page">Сайт в стадии разработки...</div>
+    {% if data %}
+      <div class="user-field">
+        Пользователь: {{ data.get('username') }};
+      </div>
+      <div class="message">
+        Статус: {{ data.get('message') }}.
+      </div>
+    {% endif %}
+{%- endblock page_body -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/main/index.js',
+             'js/main/index.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

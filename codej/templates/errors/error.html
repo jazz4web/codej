@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{%- block title -%}
+  <title>{{ error }}</title>
+{%- endblock title -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/errors/error.css',
+             'css/base.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block page_body -%}
+  <div class="error-block">
+    <h1>{{ error }}</h1>
+    <p>{{ reason }}</p>
+  </div>
+{%- endblock page_body -%}
