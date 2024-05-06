@@ -19,9 +19,13 @@ from .captcha.views import show_captcha
 from .main.views import show_favicon, show_index
 
 try:
-    from .tuning import SECRET_KEY
+    from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION
     if SECRET_KEY:
         settings.file_values['SECRET_KEY'] = SECRET_KEY
+    if SITE_NAME:
+        settings.file_values['SITE_NAME'] = SITE_NAME
+    if SITE_DESCRIPTION:
+        settings.file_values['SITE_DESCRIPTION'] = SITE_DESCRIPTION
 except ModuleNotFoundError:
     pass
 

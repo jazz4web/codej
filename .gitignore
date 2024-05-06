@@ -4,5 +4,6 @@ __pycache__
 .env
 tuning.py
 venv/
+*/static/vendor/
 */static/.webassets-cache/
 */static/generic/
