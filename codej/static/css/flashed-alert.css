@@ -1,0 +1,9 @@
+.flashed-alert {
+  border: 1px solid palegoldenrod;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: lemonchiffon;
+  background-image: linear-gradient(to bottom, lemonchiffon, lemonchiffon);
+  box-shadow: 0 0 4px wheat;
+  color: sienna;
+}

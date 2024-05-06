@@ -1,29 +1,44 @@
 {% extends "base.html" %}
 
+{%- block metas -%}
+  {{- super() -}}
+  <meta name="description"
+        content="{{ request.app.config.get('SITE_DESCRIPTION') }}">
+{%- endblock metas -%}
+
 {%- block styles -%}
   {{- super() -}}
   {%- assets filters='cssmin', output='generic/css/main/index.css',
-             'css/base.css' -%}
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/empty-message.css',
+             'css/today-field.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
   <link rel="canonical" href="{{ url_for('index') }}">
 {%- endblock styles -%}
 
 {%- block page_body -%}
-    <div class="empty-page">Сайт в стадии разработки...</div>
-    {% if data %}
-      <div class="user-field">
-        Пользователь: {{ data.get('username') }};
+  {%- if art -%}
+    <div id="topic"></div>
+  {%- else -%}
+    <div id="idef"
+         class="flashed-alert page-block">
+      <div class="today-field"></div>
+      <div class="empty-message">
+        Сайт в стадии разработки, попробуйте зайти позже.
       </div>
-      <div class="message">
-        Статус: {{ data.get('message') }}.
-      </div>
-    {% endif %}
+    </div>
+  {%- endif -%}
 {%- endblock page_body -%}
 
 {%- block scripts -%}
   {{- super() -}}
   {%- assets filters='rjsmin', output='generic/js/main/index.js',
+             'js/format-footer.js',
+             'js/check-mc.js',
+             'js/render-tf.js',
              'js/main/index.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

@@ -50,7 +50,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li>
-                  <a href="">Авторы</a>
+                  <a href="/samples/">Авторы</a>
                 </li>
                 <li>
                   <a href="">Темы</a>
@@ -77,7 +77,9 @@
       </div>
     </nav>
     <div id="page-content">
-      <div id="main-container" style="width: 500px;">
+      <div id="main-container"
+           class="{% if listed %}listed{% else %}nonlisted{% endif %}"
+           style="width: 500px;">
         {%- block page_body -%}{%- endblock page_body -%}
       </div>
     </div>

@@ -7,7 +7,9 @@
 {%- block styles -%}
   {{- super() -}}
   {%- assets filters='cssmin', output='generic/css/errors/error.css',
-             'css/base.css' -%}
+             'css/base.css',
+             'css/main-container.css',
+             'css/error.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
@@ -15,6 +17,20 @@
 {%- block page_body -%}
   <div class="error-block">
     <h1>{{ error }}</h1>
+    <img alt="error"
+         src="{{ url_for('static', path='images/error.png') }}"
+         width="96"
+         height="96">
     <p>{{ reason }}</p>
   </div>
 {%- endblock page_body -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/errors/error.js',
+            'js/format-footer.js',
+            'js/check-mc.js',
+            'js/errors/error.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
