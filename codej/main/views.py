@@ -8,7 +8,6 @@ from ..common.pg import get_conn
 
 
 async def show_index(request):
-    await set_flashed(request, 'This is a flashed message again.')
     return request.app.jinja.TemplateResponse(
         'main/index.html',
         {'request': request,
