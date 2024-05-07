@@ -80,6 +80,18 @@
       <div id="main-container"
            class="{% if listed %}listed{% else %}nonlisted{% endif %}"
            style="width: 500px;">
+        {%- if flashed -%}
+          <div class="top-flashed-block">
+            {%- for message in flashed -%}
+            <div class="flashed-message">
+              <div class="flashed-alert closeable"
+                   title="close">
+                {{ message|safe }}
+              </div>
+            </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
         {%- block page_body -%}{%- endblock page_body -%}
       </div>
     </div>

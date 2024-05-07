@@ -4,6 +4,12 @@
   padding: 12px;
   background-color: lemonchiffon;
   background-image: linear-gradient(to bottom, lemonchiffon, lemonchiffon);
-  box-shadow: 0 0 4px wheat;
-  color: sienna;
+  box-shadow: 0 0 4px burlywood;
+  text-shadow: 0 0 4px burlywood;
+  color: olive;
+  margin: 0 0 4px;
+}
+
+.closeable:hover {
+  cursor: pointer;
 }
