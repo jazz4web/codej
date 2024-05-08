@@ -8,6 +8,14 @@ from ..common.pg import get_conn
 
 
 async def show_index(request):
+    cu = None
+    if cu is None:
+        relm = request.query_params.get('relm')
+        if relm == 'login':
+            return request.app.jinja.TemplateResponse(
+                'main/login.html',
+                {'request': request,
+                 'listed': False})
     return request.app.jinja.TemplateResponse(
         'main/index.html',
         {'request': request,

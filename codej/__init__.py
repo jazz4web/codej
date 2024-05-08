@@ -15,6 +15,7 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import base, static, templates, settings
 from .errors import show_error
+from .api.main import Captcha
 from .captcha.views import show_captcha
 from .main.views import show_favicon, show_index
 
@@ -81,6 +82,8 @@ app = StApp(
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
+        Mount('/api', name='api', routes=[
+            Route('/captcha', Captcha, name='acaptcha')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     middleware=middleware,
     exception_handlers=errs)

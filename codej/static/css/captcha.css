@@ -1,0 +1,11 @@
+.captcha-field {
+  border: 1px solid lightblue;
+  box-shadow: 0 0 4px tan;
+  border-radius: 3px;
+  width: 120px;
+  height: 60px;
+}
+
+.captcha-options {
+  padding-top: 12px;
+}

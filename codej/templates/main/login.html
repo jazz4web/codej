@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/login.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/today-field.css',
+             'css/content-block.css',
+             'css/form-help.css',
+             'css/form-labeled.css',
+             'css/captcha.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="logint" type="text/template">
+    <div id="loginf" class="form-block content-block to-be-hidden">
+      <h1>Вход в сервис</h1>
+      <div class="today-field">some</div>
+      <div class="form-help">
+        <p>
+          Для входа в сервис введите свой логин, пароль и код с картинки,
+          нажмите кнопку "Войти в сервис". Логином может быть
+          зарегестрированный псевдоним или адрес электронной почты. Форма
+          действительна в течение 3-х минут. Если код на картинке плохо
+          читается, можно обновить картинку кнопкой со стрелками и найти
+          картинку с хорошо читаемым кодом. <b>Для справки:</b> код
+          состоит из строчных латинских букв и цифр без повторов, будьте
+          внимательны, очень легко спутать букву "o" и цифру "0".
+        </p>
+      </div>
+      <div class="form-form">
+        <form>
+          <div class="form-group">
+            <div class="form-label text-right">
+              <label for="logininput">Логин:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="logininput"
+                     name="logininput"
+                     autocomplete="username"
+                     placeholder="введите свой логин"
+                     required
+                     type="text">
+            </div>
+            <div class="footer-bottom"></div>
+          </div>
+          <div class="form-group">
+            <div class="form-label text-right">
+              <label for="password">Пароль:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="password"
+                     name="password"
+                     autocomplete="current-password"
+                     placeholder="введите свой пароль"
+                     required
+                     type="password">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-input checkbox">
+              <label>
+                <input id="remember_me"
+                       name="remember_me"
+                       type="checkbox">
+                <label for="remember_me">
+                  Хранить сессию 30 дней
+                </label>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label captcha-options text-right">
+              <button type="button"
+                      title="обновить картинку"
+                      id="lcaptcha-reload"
+                      class="btn btn-default">
+                <span class="glyphicon glyphicon-refresh"
+                      aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="lcaptcha-field" class="form-input captcha-field"
+                 style="background:url(<% url %>)"></div>
+            <div class="footer-bottom"></div>
+          </div>
+          <div class="form-group">
+            <div class="form-label text-right">
+              <label for="lcaptcha">Код с картинки:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="lcaptcha"
+                     placeholder="введите код с картинки"
+                     required
+                     type="text">
+            </div>
+            <div class="footer-bottom"></div>
+          </div>
+          <div class="form-group hidden">
+            <div class="form-input">
+              <input class="form-control"
+                     id="lsuffix"
+                     required
+                     type="text"
+                     value="<% captcha %>">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-input">
+              <button type="button"
+                      class="btn btn-primary"
+                      id="login-submit"
+                      name="login-submit">Войти в сервис</button>
+              <button type="button"
+                      class="btn btn-info"
+                      id="login-reg">Получить пароль</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/main/login.js',
+             'js/format-footer.js',
+             'js/check-mc.js',
+             'js/render-tf.js',
+             'js/close-topflashed.js',
+             'js/login.js',
+             'js/captcha-reload.js',
+             'js/main/login.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

@@ -1,0 +1,26 @@
+.form-form {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.form-group {
+  margin: 6px 0 0;
+}
+
+.form-label {
+  width: 25%;
+  float: left;
+  padding-top: 7px;
+}
+
+.checkbox {
+  margin: 0;
+}
+
+.checkbox label label {
+  padding-left: 3px;
+}
+
+.form-input {
+  margin-left: 26%;
+}

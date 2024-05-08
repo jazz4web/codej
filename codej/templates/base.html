@@ -21,6 +21,7 @@
         <link rel="stylesheet" href="{{ ASSET_URL }}">
       {%- endassets -%}
     {%- endblock styles -%}
+    {%- block templates -%}{%- endblock templates -%}
   </head>
   <body>
     <nav id="navigation" class="navbar navbar-default">
@@ -65,7 +66,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li>
-                  <a id="login" href="">Войти</a>
+                  <a id="login" href="/?relm=login">Войти</a>
                 </li>
                 <li>
                   <a id="reg" href="">Получить пароль</a>
