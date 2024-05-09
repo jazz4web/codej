@@ -1,0 +1,11 @@
+.flashed-error {
+  border: 1px solid lightsalmon;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: mistyrose;
+  background-image: linear-gradient(to bottom, mistyrose, mistyrose);
+  box-shadow: 0 0 4px wheat;
+  text-shadow: 0 0 4px wheat;
+  color: sienna;
+  margin: 0 0 4px;
+}

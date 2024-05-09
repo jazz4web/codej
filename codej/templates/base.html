@@ -21,7 +21,13 @@
         <link rel="stylesheet" href="{{ ASSET_URL }}">
       {%- endassets -%}
     {%- endblock styles -%}
-    {%- block templates -%}{%- endblock templates -%}
+    {%- block templates -%}
+      <script id="ealertt" type="text/template">
+        <div id="ealert" class="flashed-error to-be-hidden">
+          <%{ message }%>
+        </div>
+      </script>
+    {%- endblock templates -%}
   </head>
   <body>
     <nav id="navigation" class="navbar navbar-default">

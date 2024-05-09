@@ -25,6 +25,13 @@ CREATE TABLE accounts (
 
 CREATE TABLE sessions (
     suffix  varchar(13) UNIQUE NOT NULL,
+    brkey   varchar(32),
     logedin timestamp,
+    expire  timestamp,
     user_id integer REFERENCES users(id)
+);
+
+CREATE TABLE avatars (
+    picture bytea NOT NULL,
+    user_id integer REFERENCES users(id) UNIQUE
 );

@@ -6,6 +6,7 @@
              'css/base.css',
              'css/main-container.css',
              'css/flashed-alert.css',
+             'css/flashed-error.css',
              'css/today-field.css',
              'css/content-block.css',
              'css/form-help.css',
@@ -18,7 +19,7 @@
 {%- block templates -%}
   {{- super() -}}
   <script id="logint" type="text/template">
-    <div id="loginf" class="form-block content-block to-be-hidden">
+    <div id="loginf" class="form-block content-block">
       <h1>Вход в сервис</h1>
       <div class="today-field">some</div>
       <div class="form-help">
@@ -138,6 +139,9 @@
              'js/close-topflashed.js',
              'js/login.js',
              'js/captcha-reload.js',
+             'js/login-submit.js',
+             'js/check-browser.js',
+             'js/show-error.js',
              'js/main/login.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

@@ -7,4 +7,5 @@ $(function() {
   $('body').on('click', '#lcaptcha-reload',
     {field: '#lcaptcha-field', suffix: '#lsuffix', captcha: '#lcaptcha'},
     captchaReload);
+  $('body').on('click', '#login-submit', loginSubmit);
 });
