@@ -42,6 +42,7 @@ class Login(HTTPEndpoint):
             await set_flashed(request, f'Привет, {user.get("username")}!')
             asyncio.ensure_future(
                 change_pattern(request.app.config, suffix))
+            # rem old session?
         else:
             res['message'] = 'Неверный логин или пароль, вход невозможен.'
             await conn.close()

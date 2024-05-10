@@ -18,7 +18,7 @@ from .errors import show_error
 from .api.auth import Login
 from .api.main import Captcha
 from .captcha.views import show_captcha
-from .main.views import show_favicon, show_index
+from .main.views import show_avatar, show_favicon, show_index
 
 try:
     from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION
@@ -82,6 +82,7 @@ app = StApp(
     routes=[
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
+        Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/api', name='api', routes=[
             Route('/captcha', Captcha, name='acaptcha'),
