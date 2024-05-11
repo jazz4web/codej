@@ -17,6 +17,7 @@ from .dirs import base, static, templates, settings
 from .errors import show_error
 from .api.auth import Login
 from .api.main import Captcha, Index
+from .api.tasks import rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_index
 
@@ -69,6 +70,10 @@ class StApp(Starlette):
         await self.middleware_stack(scope, receive, send)
 
 
+async def run_before():
+    await rem_expired_sessions(settings)
+
+
 middleware = [
     Middleware(
         SessionMiddleware,
@@ -89,6 +94,6 @@ app = StApp(
             Route('/captcha', Captcha, name='acaptcha'),
             Route('/login', Login, name='alogin')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
+    on_startup=[run_before],
     middleware=middleware,
     exception_handlers=errs)
-

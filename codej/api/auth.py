@@ -8,7 +8,7 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .redi import extract_cache
 from .pg import create_session, filter_user
-from .tasks import change_pattern
+from .tasks import change_pattern, rem_old_session
 from .tokens import create_login_token
 
 BADCAPTCHA = 'Тест провален, либо устарел, попробуйте снова.'
@@ -42,7 +42,8 @@ class Login(HTTPEndpoint):
             await set_flashed(request, f'Привет, {user.get("username")}!')
             asyncio.ensure_future(
                 change_pattern(request.app.config, suffix))
-            # rem old session?
+            asyncio.ensure_future(
+                rem_old_session(request.app.config, user.get('id')))
         else:
             res['message'] = 'Неверный логин или пароль, вход невозможен.'
             await conn.close()

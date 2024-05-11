@@ -7,6 +7,7 @@ from ..auth.attri import groups
 session = '''SELECT u,id, u.username, u.ugroup, s.brkey
                  FROM users AS u, sessions AS s
                  WHERE u.id = s.user_id AND s.suffix = $1'''
+old = 'DELETE FROM sessions WHERE suffix = $1'
 
 
 async def checkcu(request, conn, token):
@@ -17,8 +18,7 @@ async def checkcu(request, conn, token):
         if query and query.get('ugroup') == groups.pariah:
             if request.session.get('_uid'):
                 request.session.pop('_uid')
-            await conn.execute(
-                'DELETE FROM sessions WHERE suffix = $1', cache)
+            await conn.execute(old, cache)
             return None
         if query:
             asyncio.ensure_future(
@@ -30,8 +30,9 @@ async def checkcu(request, conn, token):
                     'ava': request.url_for(
                         'ava', username=query.get('username'), size=22)._url}
     else:
-        if request.session.get('_uid'):
+        if s := request.session.get('_uid'):
             request.session.pop('_uid')
+            await conn.execute(old, s)
     return None
 
 
@@ -40,8 +41,7 @@ async def getcu(request, conn):
         query = await conn.fetchrow(session, cache)
         if query and query.get('ugroup') == groups.pariah:
             request.session.pop('_uid')
-            await conn.execute(
-                'DELETE FROM sessions WHERE suffix = $1', cache)
+            await conn.execute(old, cache)
             await set_flashed(
                 request, 'Ваше присутствие в сервисе нежелательно.')
             return None
