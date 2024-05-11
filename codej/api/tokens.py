@@ -1,6 +1,15 @@
 from datetime import timedelta
 
-from jwt import encode as jwtencode
+from jwt import decode as jwtdecode, encode as jwtencode, PyJWTError
+
+
+async def check_token(config, token):
+    try:
+        cache = jwtdecode(
+            token, config.get('SECRET_KEY'), algorithms=['HS256'])
+    except PyJWTError:
+        return None
+    return cache
 
 
 async def create_login_token(request, rme, cache, now):

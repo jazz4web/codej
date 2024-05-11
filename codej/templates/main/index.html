@@ -35,11 +35,13 @@
 
 {%- block scripts -%}
   {{- super() -}}
+  <script>let cu="{{ cu.username }}";</script>
   {%- assets filters='rjsmin', output='generic/js/main/index.js',
              'js/format-footer.js',
              'js/check-mc.js',
              'js/render-tf.js',
              'js/close-topflashed.js',
+             'js/ping-user.js',
              'js/main/index.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

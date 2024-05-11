@@ -5,6 +5,7 @@ import os
 from starlette.exceptions import HTTPException
 from starlette.responses import FileResponse, Response
 
+from ..auth.cu import getcu
 from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 from ..dirs import static
@@ -42,7 +43,9 @@ async def show_avatar(request):
 
 
 async def show_index(request):
-    cu = None
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    await conn.close()
     if cu is None:
         relm = request.query_params.get('relm')
         if relm == 'login':
@@ -54,6 +57,7 @@ async def show_index(request):
         'main/index.html',
         {'request': request,
          'flashed': await get_flashed(request),
+         'cu': cu,
          'listed': True})
 
 

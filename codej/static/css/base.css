@@ -24,6 +24,10 @@ body {
   padding-top: 10px;
 }
 
+.cu-name {
+  margin: 0 4px 0 5px;
+}
+
 .to-be-hidden {
   display: none;
 }

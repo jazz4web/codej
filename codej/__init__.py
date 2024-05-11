@@ -16,7 +16,7 @@ from webassets.ext.jinja2 import assets
 from .dirs import base, static, templates, settings
 from .errors import show_error
 from .api.auth import Login
-from .api.main import Captcha
+from .api.main import Captcha, Index
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_index
 
@@ -85,6 +85,7 @@ app = StApp(
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/api', name='api', routes=[
+            Route('/index', Index, name='aindex'),
             Route('/captcha', Captcha, name='acaptcha'),
             Route('/login', Login, name='alogin')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
