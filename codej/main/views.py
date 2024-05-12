@@ -46,18 +46,25 @@ async def show_index(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
     await conn.close()
+    relm = request.query_params.get('relm')
     if cu is None:
-        relm = request.query_params.get('relm')
         if relm == 'login':
             return request.app.jinja.TemplateResponse(
                 'main/login.html',
                 {'request': request,
                  'listed': False})
+    logout,lall = 0, 0
+    if cu and relm == 'logoutall':
+        lall = 1
+    if cu and relm == 'logout':
+        logout = 1
     return request.app.jinja.TemplateResponse(
         'main/index.html',
         {'request': request,
          'flashed': await get_flashed(request),
          'cu': cu,
+         'logout': logout,
+         'lall': lall,
          'listed': True})
 
 

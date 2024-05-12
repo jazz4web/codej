@@ -9,9 +9,58 @@ from ..common.pg import get_conn
 from .redi import extract_cache
 from .pg import create_session, filter_user
 from .tasks import change_pattern, rem_old_session
-from .tokens import create_login_token
+from .tokens import check_token, create_login_token
 
 BADCAPTCHA = 'Тест провален, либо устарел, попробуйте снова.'
+
+
+class LogoutAll(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'result': None}
+        token = (await request.form()).get('token')
+        if token:
+            cache = await check_token(request.app.config, token)
+            if cache:
+                cache = cache.get('cache')
+                if request.session.get('_uid') == cache:
+                    conn = await get_conn(request.app.config)
+                    user = await conn.fetchrow(
+                        '''SELECT users.id, users.username
+                             FROM users, sessions
+                             WHERE sessions.suffix = $1
+                               AND sessions.user_id = users.id''', cache)
+                    await conn.execute(
+                        'DELETE FROM sessions WHERE user_id = $1',
+                        user.get('id'))
+                    await conn.close()
+                    request.session.pop('_uid')
+                    await set_flashed(
+                        request, f'Пока, {user.get("username")}!')
+                    res['result'] = True
+        return JSONResponse(res)
+
+
+class Logout(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'result': None}
+        token = (await request.form()).get('token')
+        if token:
+            cache = await check_token(request.app.config, token)
+            if cache:
+                cache = cache.get('cache')
+                if request.session.get('_uid') == cache:
+                    conn = await get_conn(request.app.config)
+                    username = await conn.fetchval(
+                        '''SELECT users.username FROM users, sessions
+                             WHERE sessions.suffix = $1
+                               AND sessions.user_id = users.id''', cache)
+                    await conn.execute(
+                        'DELETE FROM sessions WHERE suffix = $1', cache)
+                    await conn.close()
+                    request.session.pop('_uid')
+                    await set_flashed(request, f'Пока, {username}!')
+                    res['result'] = True
+        return JSONResponse(res)
 
 
 class Login(HTTPEndpoint):
