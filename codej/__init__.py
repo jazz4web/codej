@@ -15,14 +15,16 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import base, static, templates, settings
 from .errors import show_error
-from .api.auth import Login, Logout, LogoutAll
+from .api.auth import GetPasswd, Login, Logout, LogoutAll
 from .api.main import Captcha, Index
 from .api.tasks import rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_index
 
 try:
-    from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION
+    from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION, MAIL_PASSWORD
+    if MAIL_PASSWORD:
+        settings.file_values['MAIL_PASSWORD'] = MAIL_PASSWORD
     if SECRET_KEY:
         settings.file_values['SECRET_KEY'] = SECRET_KEY
     if SITE_NAME:
@@ -94,7 +96,9 @@ app = StApp(
             Route('/captcha', Captcha, name='acaptcha'),
             Route('/login', Login, name='alogin'),
             Route('/logout', Logout, name='alogout'),
-            Route('/logoutall', LogoutAll, name='alogoutall')]),
+            Route('/logoutall', LogoutAll, name='alogoutall'),
+            Route('/request-reg', GetPasswd, name='agetpasswd')
+            ]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     on_startup=[run_before],
     middleware=middleware,

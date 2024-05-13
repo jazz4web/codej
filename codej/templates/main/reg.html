@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/login.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/content-block.css',
+             'css/form-help.css',
+             'css/form-labeled.css',
+             'css/captcha.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="regt" type="text/template">
+    <div id="regf" class="form-block content-block">
+      <h1>Запрос регистрации или восстановления пароля</h1>
+      <div class="today-field">some</div>
+      <div class="form-help">
+        <p>
+          Уважаемый гость, получить пароль можно, заполнив форму ниже,
+          в ней нужно ввести в соответствующие поля Ваш адрес электронной
+          почты и код с картинки, а затем нажать кнопку "Получить пароль".
+          На Ваш адрес будет выслано письмо с дальнейшими инструкциями,
+          следуйте им. Форма действительна в течение 3-минут с момента
+          загрузки этой страницы, или с момента обновления картинки с кодом.
+          Если картинка с кодом плохо читается, её можно обновить кнопкой
+          со стрелками слева от картинки. <b>Для справки:</b> код на картинке
+          состоит из строчных латинских букв и цифр без повторов, будьте
+          внимательны, очень легко спутать букву "о" и цифру "0".
+        </p>
+      </div>
+      <div class="form-form">
+        <div class="form-group">
+          <div class="form-label text-right">
+            <label for="raddress">Адрес эл.почты:</label>
+          </div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="raddress"
+                   maxlength="128"
+                   name="raddress"
+                   placeholder="введите свой адрес эл.почты"
+                   required
+                   type="text">
+          </div>
+          <div class="footer-bottom"></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label captcha-options text-right">
+            <button type="button"
+                    title="обновить картинку"
+                    id="rcaptcha-reload"
+                    class="btn btn-default">
+              <span class="glyphicon glyphicon-refresh"
+                    aria-hidden="true"></span>
+            </button>
+          </div>
+          <div id="rcaptcha-field" class="form-input captcha-field"
+               style="background:url(<% url %>)"></div>
+          <div class="footer-bottom"></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label text-right">
+            <label for="rcaptcha">Код с картинки:</label>
+          </div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="rcaptcha"
+                   placeholder="введите код с картинки"
+                   required
+                   type="text">
+          </div>
+          <div class="footer-bottom"></div>
+        </div>
+        <div class="form-group hidden">
+          <div class="form-input">
+            <input class="form-control"
+                   id="rsuffix"
+                   required
+                   type="text"
+                   value="<% captcha %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-input">
+            <button type="button"
+                    class="btn btn-primary"
+                    id="reg-submit">Получить пароль</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/main/login.js',
+             'js/format-footer.js',
+             'js/check-mc.js',
+             'js/render-tf.js',
+             'js/close-topflashed.js',
+             'js/captcha-reload.js',
+             'js/reg-submit.js',
+             'js/show-error.js',
+             'js/main/reg.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
