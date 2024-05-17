@@ -48,6 +48,12 @@ async def show_index(request):
     await conn.close()
     realm = request.query_params.get('realm')
     if cu is None:
+        if realm == 'rpasswd':
+            return request.app.jinja.TemplateResponse(
+                'main/resetpwd.html',
+                {'request': request,
+                 'key': request.query_params.get('key'),
+                 'listed': False})
         if realm == 'reg':
             return request.app.jinja.TemplateResponse(
                 'main/reg.html',
