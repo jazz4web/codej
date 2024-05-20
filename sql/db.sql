@@ -8,6 +8,7 @@ CREATE TABLE users (
     id             serial PRIMARY KEY,
     username       varchar(16) UNIQUE NOT NULL,
     ugroup         varchar(16),
+    weight         smallint,
     registered     timestamp,
     last_visit     timestamp,
     password_hash  varchar(128),

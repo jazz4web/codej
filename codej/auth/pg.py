@@ -3,7 +3,7 @@ from datetime import datetime
 from passlib.hash import pbkdf2_sha256
 
 from ..common.pg import get_conn
-from .attri import groups
+from .attri import groups, weigh
 
 
 async def check_username(config, username):
@@ -30,9 +30,10 @@ async def check_address(config, address):
 async def create_user_record(conn, username, passwd, group, now):
     await conn.execute(
         '''INSERT INTO users
-           (username, registered, last_visit, password_hash, ugroup)
-           VALUES ($1, $2, $3, $4, $5)''',
-        username, now, now, pbkdf2_sha256.hash(passwd), group)
+           (username, ugroup, weight, registered, last_visit, password_hash)
+           VALUES ($1, $2, $3, $4, $5, $6)''',
+        username, group, await weigh(group),
+        now, now, pbkdf2_sha256.hash(passwd))
     return await conn.fetchval(
         'SELECT id FROM users WHERE username = $1', username)
 

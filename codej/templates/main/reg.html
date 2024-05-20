@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{%- block title_part -%}Reg/ResetPWD{%- endblock title_part -%}
+
 {%- block styles -%}
   {{- super() -}}
   {%- assets filters='cssmin', output='generic/css/main/login.css',

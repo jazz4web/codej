@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{%- block title_part -%}ResetPWD{%- endblock title_part -%}
+{%- block title_part -%}SetPWD{%- endblock title_part -%}
 
 {%- block styles -%}
   {{- super() -}}
-  {%- assets filters='cssmin', output='generic/css/main/resetpwd.css',
+  {%- assets filters='cssmin', output='generic/css/main/setpwd.css',
              'css/base.css',
              'css/main-container.css',
              'css/flashed-alert.css',
@@ -19,35 +19,36 @@
 
 {%- block templates -%}
   {{- super() -}}
-  <script id="rspt" type="text/template">
-    <div id="rspf" class="form-block content-block">
-      <h1>Восстановите забытый пароль</h1>
+  <script id="crpt" type="text/template">
+    <div id="crpf" class="form-block content-block">
+      <h1>Создайте свой пароль</h1>
       <div class="today-field"></div>
       <div class="form-help">
         <p>
-          Уважаемый <% username %>, здесь Вы можете восстановить свой забытый
-          пароль, для этого заполните форму ниже. Введите в соответствующие
-          поля Ваш адрес электронной почты, на который Вы получили сообщение
-          со ссылкой на эту страницу, придумайте и введите новый пароль,
-          повторите его ввод в поле "Повторить" и нажмите кнопку "Обновить
-          пароль", будьте внимательны, после обновления пароля Вы сможете
-          войти в сервис только с новым паролем. Повторно запросить
-          восстановление пароля можно будет не ранее чем через {{ interval }}
-          часов.
+          Уважаемый гость, для создания пароля заполните форму ниже.
+          Придумайте и введите в соответствующие поля желаемый псевдоним и
+          пароль. Пароль нужно ввести второй раз в поле "Повторить".
+          Псевдоним может содержать от 3-х до 16-ти символов (латинские
+          буквы, буквы русского алфавита, цифры, знак подчёркивания, дефис и
+          точка), первый символ псевдонима должен быть латинской или русской
+          буквой. Нажмите кнопку "Создать пароль". Будьте внимательны,
+          псевдоним и пароль Вам потребуются для входа в сервис, а восстановить
+          пароль можно будет не ранее чем через {{ interval }} часов с момента
+          запроса регистрационной формы.
         </p>
       </div>
       <div class="form-form">
         <form>
           <div class="form-group">
             <div class="form-label text-right">
-              <label for="rsaddress">Адрес эл.почты:</label>
+              <label for="username">Псевдоним:</label>
             </div>
             <div class="form-input">
               <input class="form-control"
-                     id="rsaddress"
-                     name="rsaddress"
-                     placeholder="введите свой адрес электронной почты"
+                     id="username"
+                     name="username"
                      autocomplete="username"
+                     placeholder="введите желаемый псевдоним"
                      required
                      type="text">
             </div>
@@ -55,12 +56,12 @@
           </div>
           <div class="form-group">
             <div class="form-label text-right">
-              <label for="rspassword">Новый пароль:</label>
+              <label for="crpassword">Пароль:</label>
             </div>
             <div class="form-input">
               <input class="form-control"
-                     id="rspassword"
-                     name="rspassword"
+                     id="crpassword"
+                     name="crpassword"
                      placeholder="введите желаемый пароль"
                      autocomplete="new-password"
                      required
@@ -70,15 +71,15 @@
           </div>
           <div class="form-group">
             <div class="form-label text-right">
-              <label for="rsconfirm">Повторить:</label>
+              <label for="confirmation">Повторить:</label>
             </div>
             <div class="form-input">
               <input class="form-control"
-                     id="rsconfirm"
-                     name="rsconfirm"
+                     id="confirmation"
+                     name="confirmation"
                      placeholder="повторите пароль"
-                     autocomplete="new-password"
                      required
+                     autocomplete="new-password"
                      type="password">
             </div>
             <div class="footer-bottom"></div>
@@ -87,9 +88,9 @@
             <div class="form-input">
               <button type="button"
                       class="btn btn-primary btn-block"
-                      id="rsp-submit"
-                      name="rsp-submit"
-                      data-aid="<% aid %>">Обновить пароль</button>
+                      id="crp-submit"
+                      name="crp-submit"
+                      data-aid="<% aid %>">Создать пароль</button>
             </div>
           </div>
         </form>
@@ -101,14 +102,14 @@
 {%- block scripts -%}
   {{- super() -}}
   <script>let key="{{ key }}";</script>
-  {%- assets filters='rjsmin', output='generic/js/main/resetpwd.js',
+  {%- assets filters='rjsmin', output='generic/js/main/setpwd.js',
              'js/format-footer.js',
              'js/check-mc.js',
              'js/render-tf.js',
              'js/close-topflashed.js',
              'js/slide-page.js',
              'js/show-error.js',
-             'js/main/resetpwd.js' -%}
+             'js/main/setpwd.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}

@@ -6,12 +6,23 @@ from datetime import datetime
 from aiosmtplib import send
 from email.message import EmailMessage
 
+from ..auth.attri import defaultg
+from ..auth.pg import create_user_record
 from ..captcha.common import check_val
 from ..captcha.picturize.picture import generate_image
 from ..common.pg import get_conn
 from .pg import define_acc, get_acc
 from .tokens import get_request_token
 from .tools import define_target_url
+
+
+async def create_user(config, username, passwd, aid):
+    conn = await get_conn(config)
+    now = datetime.utcnow()
+    user_id = await create_user_record(conn, username, passwd, defaultg, now)
+    await conn.execute(
+        'UPDATE accounts SET user_id = $1 WHERE id = $2', user_id, aid)
+    await conn.close()
 
 
 async def request_passwd(request, account, address):

@@ -6,42 +6,43 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   $.ajax({
     method: 'GET',
-    url: '/api/reset-passwd',
+    url: '/api/setpasswd',
     headers: {
-      'x-reg-token': key
+      'x-reg-token': key,
     },
     success: function(data) {
-      if (!data.aid) {
-        let html = Mustache.render($('#ealertt').html(), data);
-        $('#main-container').append(html).removeClass('nonlisted');
-        slidePage('#ealert');
-      } else {
-        let html = Mustache.render($('#rspt').html(), data);
+      if (data.aid) {
+        let html = Mustache.render($('#crpt').html(), data);
         $('#main-container').append(html);
         if ($('.today-field').length) renderTF('.today-field', dt);
         checkMC(860);
+      } else {
+        let html = Mustache.render($('#ealertt').html(), data);
+        $('#main-container').append(html).removeClass('nonlisted');
+        slidePage('#ealert');
       }
     },
     dataType: 'json'
   });
-  $('body').on('click', '#rsp-submit', function() {
+  $('body').on('click', '#crp-submit', function() {
     $(this).blur();
     let tee = {
-      address: $('#rsaddress').val(),
-      passwd: $('#rspassword').val(),
-      confirma: $('#rsconfirm').val(),
+      username: $('#username').val(),
+      passwd: $('#crpassword').val(),
+      confirma: $('#confirmation').val(),
       aid: $(this).data().aid
     };
-    if (tee.address && tee.passwd && tee.confirma && tee.aid) {
+    if (tee.username && tee.passwd && tee.confirma && tee.aid) {
       $.ajax({
         method: 'POST',
-        url: '/api/reset-passwd',
+        url: '/api/setpasswd',
         data: tee,
         success: function(data) {
+          console.log(data);
           if (data.done) {
             window.location.replace('/');
           } else {
-            showError('#rspf', data);
+            showError('#crpf', data);
           }
         },
         dataType: 'json'

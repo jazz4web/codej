@@ -2,11 +2,11 @@ import asyncio
 
 from ..api.tasks import ping_user
 from ..api.tokens import check_token
-from ..auth.attri import groups
+from ..auth.attri import groups, weigh
 
-session = '''SELECT u,id, u.username, u.ugroup, s.brkey
-                 FROM users AS u, sessions AS s
-                 WHERE u.id = s.user_id AND s.suffix = $1'''
+session = '''SELECT u,id, u.username, u.ugroup, u.weight, s.brkey
+               FROM users AS u, sessions AS s
+               WHERE u.id = s.user_id AND s.suffix = $1'''
 old = 'DELETE FROM sessions WHERE suffix = $1'
 
 
@@ -26,6 +26,7 @@ async def checkcu(request, conn, token):
             return {'id': query.get('id'),
                     'username': query.get('username'),
                     'group': query.get('ugroup'),
+                    'weight': query.get('weight'),
                     'brkey': query.get('brkey'),
                     'ava': request.url_for(
                         'ava', username=query.get('username'), size=22)._url}
@@ -51,6 +52,7 @@ async def getcu(request, conn):
             return {'id': query.get('id'),
                     'username': query.get('username'),
                     'group': query.get('ugroup'),
+                    'weight': query.get('weight'),
                     'brkey': query.get('brkey'),
                     'ava': request.url_for(
                         'ava', username=query.get('username'), size=22)._url}
