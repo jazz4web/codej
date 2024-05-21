@@ -11,15 +11,19 @@ from ..auth.pg import create_user_record
 from ..captcha.common import check_val
 from ..captcha.picturize.picture import generate_image
 from ..common.pg import get_conn
+from ..common.redi import get_rc
 from .pg import define_acc, get_acc
 from .tokens import get_request_token
 from .tools import define_target_url
 
 
-async def create_user(config, username, passwd, aid):
-    conn = await get_conn(config)
+async def create_user(request, username, passwd, aid):
+    conn = await get_conn(request.app.config)
     now = datetime.utcnow()
-    user_id = await create_user_record(conn, username, passwd, defaultg, now)
+    rc = await get_rc(request, future=True)
+    dg = await rc.get('def:group') or defaultg
+    await rc.aclose()
+    user_id = await create_user_record(conn, username, passwd, dg, now)
     await conn.execute(
         'UPDATE accounts SET user_id = $1 WHERE id = $2', user_id, aid)
     await conn.close()

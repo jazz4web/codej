@@ -74,7 +74,7 @@ class SetPasswd(HTTPEndpoint):
             res['message'] = 'Данные неверны, действие отменено.'
             return JSONResponse(res)
         asyncio.ensure_future(
-            create_user(request.app.config, username, passwd, acc.get('id')))
+            create_user(request, username, passwd, acc.get('id')))
         res['done'] = True
         await set_flashed(
             request, f'Аккаунт {username} успешно создан, вы можете войти.')

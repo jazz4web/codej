@@ -5,6 +5,23 @@ from ..auth.attri import groups
 from ..common.random import get_unique_s
 
 
+async def check_rel(conn, uid1, uid2):
+    friend = bool(await conn.fetchrow(
+        '''SELECT author_id, friend_id FROM friends
+             WHERE author_id = $1 AND friend_id = $2''', uid1, uid2))
+    follower = bool(await conn.fetchrow(
+        '''SELECT author_id, follower_id FROM followers
+             WHERE author_id = $1 AND follower_id = $2''', uid1, uid2))
+    blocker = bool(await conn.fetchrow(
+        '''SELECT target_id, blocker_id FROM blockers
+             WHERE target_id = $1 AND blocker_id = $2''', uid2, uid1))
+    blocked = bool(await conn.fetchrow(
+        '''SELECT target_id, blocker_id FROM blockers
+             WHERE target_id = $1 AND blocker_id = $2''', uid1, uid2))
+    return {'friend': friend, 'follower': follower,
+            'blocker': blocker, 'blocked': blocked}
+
+
 async def filter_target_user(request, conn, username):
     query = await conn.fetchrow(
         '''SELECT id, username, ugroup, weight, registered,

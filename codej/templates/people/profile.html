@@ -13,7 +13,8 @@
              'css/content-block.css',
              'css/profile.css',
              'css/avatar.css',
-             'css/personal-details.css' -%}
+             'css/personal-details.css',
+             'css/next-block.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
@@ -22,7 +23,7 @@
   {{- super() -}}
   <script id="profilet" type="text/template">
     <div id="profile" class="entity-block content-block">
-      <h1>Профиль <% user.username %></h1>
+      <h2>Профиль <% user.username %></h2>
       <div class="details-block">
         <div class="user-avatar avatar"
              style="background:url(<% user.ava %>)"></div>
@@ -56,6 +57,30 @@
         <div class="footer-bottom"></div>
       </div>
     </div>
+    <% #owner %>
+      <div class="entity-block next-block">
+        <div class="actions-header">
+          <h2>Действия</h2>
+        </div>
+        <div class="actions-body text-center">
+          <button id="emchange"
+                  type="button"
+                  class="btn btn-default">
+            Сменить адрес
+          </button>
+          <button id="changepwd"
+                  type="button"
+                  class="btn btn-default">
+            Сменить пароль
+          </button>
+          <button id="chageava"
+                  type="button"
+                  class="btn btn-default">
+            Сменить аватар
+          </button>
+        </div>
+      </div>
+    <% /owner %>
   </script>
 {%- endblock templates -%}
 
