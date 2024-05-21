@@ -5,6 +5,25 @@ from ..auth.attri import groups
 from ..common.random import get_unique_s
 
 
+async def filter_target_user(request, conn, username):
+    query = await conn.fetchrow(
+        '''SELECT id, username, ugroup, weight, registered,
+                  last_visit, description, last_published FROM users
+             WHERE username = $1''', username)
+    if query:
+        return {'uid': query.get('id'),
+                'username': query.get('username'),
+                'group': query.get('ugroup'),
+                'weight': query.get('weight'),
+                'registered': f'{query.get("registered").isoformat()}Z',
+                'last_visit': f'{query.get("last_visit").isoformat()}Z',
+                'description': query.get('description'),
+                'last_published': f'{query.get("last_published").isoformat()}Z'
+                if query.get('last_published') else None,
+                'ava': request.url_for(
+                    'ava', username=query.get('username'), size=160)._url}
+
+
 async def define_acc(conn, account):
     if account and account.get('user_id'):
         username = await conn.fetchval(

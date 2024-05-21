@@ -1,0 +1,8 @@
+.entity-block {
+  padding: 8px;
+  border: 1px solid gainsboro;
+  border-radius: 4px;
+  background-color: ivory;
+  background-image: linear-gradient(to top, ivory, ivory);
+  box-shadow: 0 0 4px gainsboro;
+}

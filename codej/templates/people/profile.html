@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Профиль {{ cu['username'] }}{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/people/profile.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/entity-block.css',
+             'css/content-block.css',
+             'css/profile.css',
+             'css/avatar.css',
+             'css/personal-details.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="profilet" type="text/template">
+    <div id="profile" class="entity-block content-block">
+      <h1>Профиль <% user.username %></h1>
+      <div class="details-block">
+        <div class="user-avatar avatar"
+             style="background:url(<% user.ava %>)"></div>
+        <div class="user-info">
+          <h3><% user.username %></h3>
+          <div class="personal-details">
+            <table class="user-info-table">
+              <tbody>
+              <tr>
+                <td>Группа:&nbsp;</td>
+                <td><% user.group %></td>
+              </tr>
+              <% #address %>
+              <tr class="address-row">
+                <td>Почта:&nbsp;</td>
+                <td><% user.address %></td>
+              </tr>
+              <% /address %>
+              <tr>
+                <td>Зарегистрирован:&nbsp;</td>
+                <td class="date-field"><% user.registered %></td>
+              </tr>
+              <tr>
+                <td>Последний визит:&nbsp;</td>
+                <td class="last-seen"><% user.last_visit %></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="footer-bottom"></div>
+      </div>
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}", username="{{ username }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/people/profile.js',
+             'js/check-mc.js',
+             'js/ping-user.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/check-browser.js',
+             'js/format-datetime.js',
+             'js/render-lastseen.js',
+             'js/people/profile.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

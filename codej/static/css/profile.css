@@ -1,0 +1,32 @@
+.user-avatar {
+  width: 160px;
+  height: 160px;
+  float: left;
+}
+
+.user-info {
+  margin-left: 172px;
+  padding-top: 4px;
+}
+
+.user-info h3 {
+  margin: 0 0 4px 0;
+  font-style: italic;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.user-info-table {
+  border-collapse: collapse;
+}
+
+.user-info-table tr {
+  border-bottom: 1px dashed lightgray;
+}
+
+.user-info-table td {
+  padding: 2px 8px;
+}
+
+.details-block {
+  margin: 6px 0 0;
+}
