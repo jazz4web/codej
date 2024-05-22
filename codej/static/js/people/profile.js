@@ -43,6 +43,31 @@ $(function() {
     },
     dataType: 'json'
   });
+  $('body').on('click', '#changepwd-submit', function() {
+    $(this).blur();
+    let tee = {
+      passwd: $('#curpwd').val(),
+      newpwd: $('#newpwd').val(),
+      confirma: $('#newpwdconfirm').val(),
+      auth: window.localStorage.getItem('token')
+    };
+    if (tee.passwd && tee.newpwd && tee.confirma && tee.auth) {
+      $.ajax({
+        method: 'POST',
+        url: '/api/change-passwd',
+        data: tee,
+        success: function(data) {
+          if (data.done) {
+            window.location.assign('/');
+          } else {
+            showError('#profile', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    }
+  });
   $('body').on('change', '#image', function() {
     $('#ealert').remove();
     let file = $(this)[0].files[0];
