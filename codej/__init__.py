@@ -16,7 +16,7 @@ from webassets.ext.jinja2 import assets
 from .dirs import base, static, templates, settings
 from .errors import show_error
 from .api.auth import (
-    GetPasswd, Login, Logout, LogoutAll, ResetPasswd, SetPasswd)
+    ChangeAva, GetPasswd, Login, Logout, LogoutAll, ResetPasswd, SetPasswd)
 from .api.main import Captcha, Index
 from .api.people import Profile
 from .api.tasks import rem_expired_sessions
@@ -104,6 +104,7 @@ app = StApp(
             Route('/reset-passwd', ResetPasswd, name='aresetpwd'),
             Route('/setpasswd', SetPasswd, name='asetpwd'),
             Route('/profile', Profile, name='aprofile'),
+            Route('/change-ava', ChangeAva, name='chava'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/{username}', show_profile, name='profile')]),

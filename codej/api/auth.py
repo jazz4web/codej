@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import re
 
 from datetime import datetime
@@ -9,9 +10,11 @@ from starlette.responses import JSONResponse
 from validate_email import validate_email
 
 from ..auth.attri import USER_PATTERN
+from ..auth.cu import checkcu
 from ..auth.pg import check_username
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
+from .avas import check_img
 from .redi import extract_cache
 from .pg import check_address, create_session, filter_user
 from .tasks import (
@@ -20,6 +23,49 @@ from .tokens import check_token, create_login_token
 from .tools import fix_bad_token
 
 BADCAPTCHA = 'Тест провален, либо устарел, попробуйте снова.'
+
+
+class ChangeAva(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        img, auth = d.get('image'), d.get('token')
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if cu is None:
+            res['message'] = 'Действие требует авторизации.'
+            await conn.close()
+            return JSONResponse(res)
+        if not img:
+            res['message'] = 'Требуется файл изображения.'
+            await conn.close()
+            return JSONResponse(res)
+        binary = await img.read()
+        await img.close()
+        if len(binary) > 200 * 1024:
+            res['message'] = 'Недопустимый размер файла.'
+            await conn.close()
+            return JSONResponse(res)
+        loop = asyncio.get_running_loop()
+        img = await loop.run_in_executor(
+            None, functools.partial(check_img, binary))
+        if img is None:
+            res['message'] = 'Файл не соответствует заданным условиям.'
+            await conn.close()
+            return JSONResponse(res)
+        uid = await conn.fetchval(
+            'SELECT user_id FROM avatars WHERE user_id = $1', cu.get('id'))
+        if uid:
+            await conn.execute(
+                'UPDATE avatars SET picture = $1 WHERE user_id = $2',
+                img, uid)
+        else:
+            await conn.execute(
+                'INSERT INTO avatars (picture, user_id) VALUES ($1, $2)',
+                img, cu.get('id'))
+        await conn.close()
+        res['done'] = True
+        return JSONResponse(res)
 
 
 class SetPasswd(HTTPEndpoint):
