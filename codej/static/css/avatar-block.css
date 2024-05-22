@@ -1,0 +1,17 @@
+#changeavaf .avatar {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+}
+
+#changeavaf .form-help {
+  margin: 4px 0 0;
+}
+
+#changeavaf .form-help p {
+  margin: 0;
+}
+
+#changeavaf .form-group {
+  margin: 2px 0 0;
+}

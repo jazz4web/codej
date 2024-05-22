@@ -37,10 +37,58 @@ $(function() {
         $('#main-container').append(html);
         formatDateTime($('#profile .date-field'));
         renderLastSeen($('#profile .last-seen'));
+        if ($('.today-field').length) renderTF('.today-field', dt);
         checkMC(860);
-        // here we are;
       }
     },
     dataType: 'json'
+  });
+  $('body').on('click', '#emchange', function() {
+    $(this).blur();
+    let em = $('#changeemf');
+    if (em.is(':hidden')) {
+      $('#changeavaf').slideUp('slow');
+      $('#changepwdf').slideUp('slow');
+      em.slideDown('slow', function() {
+        scrollPanel(em);
+        checkMC(860);
+      });
+    } else {
+      em.slideUp('slow', function() {
+        checkMC(860);
+      });
+    }
+  });
+  $('body').on('click', '#changepwd', function() {
+    $(this).blur();
+    let pwd = $('#changepwdf');
+    if (pwd.is(':hidden')) {
+      $('#changeavaf').slideUp('slow');
+      $('#changeemf').slideUp('slow');
+      pwd.slideDown('slow', function() {
+        scrollPanel(pwd);
+        checkMC(860);
+      });
+    } else {
+      pwd.slideUp('slow', function() {
+        checkMC(860);
+      });
+    }
+  });
+  $('body').on('click', '#changeava', function() {
+    $(this).blur();
+    let ava = $('#changeavaf');
+    if (ava.is(':hidden')) {
+      $('#changepwdf').slideUp('slow');
+      $('#changeemf').slideUp('slow');
+      ava.slideDown('slow', function() {
+        scrollPanel(ava);
+        checkMC(860);
+      });
+    } else {
+      ava.slideUp('slow', function() {
+        checkMC(860);
+      });
+    }
   });
 });

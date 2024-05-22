@@ -7,14 +7,18 @@
   {%- assets filters='cssmin', output='generic/css/people/profile.css',
              'css/base.css',
              'css/main-container.css',
+             'css/today-field.css',
              'css/flashed-alert.css',
              'css/flashed-error.css',
              'css/entity-block.css',
              'css/content-block.css',
              'css/profile.css',
              'css/avatar.css',
+             'css/avatar-block.css',
              'css/personal-details.css',
-             'css/next-block.css' -%}
+             'css/form-help.css',
+             'css/next-block.css',
+             'css/form-labeled.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
@@ -58,6 +62,188 @@
       </div>
     </div>
     <% #owner %>
+      <div id="changeemf" class="entity-block to-be-hidden next-block">
+        <div class="actions-header">
+          <h2>Отправьте запрос на смену адреса</h2>
+        </div>
+        <div class="form-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Уважаемый <% user.username %>, для смены адреса электронной
+              почты Вашего аккаунта необходимо заполнить форму ниже. Введите в
+              соответствующие поля Ваш новый адрес электронной почты и пароль,
+              нажмите кнопку "Отправить запрос". На Ваш новый адрес будет
+              выслана инструкция о дальнейших действиях, следуйте ей. Имейте
+              ввиду, что смену адреса и сброс пароля Вы можете запросить один
+              раз в {{ interval }} часов и не ранее чем через {{ interval }}
+              часов с момента регистрации.
+            </p>
+          </div>
+          <div class="form-form">
+            <form>
+              <div class="form-group">
+                <div class="form-label text-right">
+                  <label for="chaddress">Адрес эл.почты:</label>
+                </div>
+                <div class="form-input">
+                  <input id="chaddress"
+                         name="chaddress"
+                         class="form-control"
+                         placeholder="введите свой адрес электронной почты"
+                         autocomplete="username"
+                         required
+                         type="text">
+                </div>
+                <div class="footer-bottom"></div>
+              </div>
+              <div class="form-group">
+                <div class="form-label text-right">
+                  <label for="chapasswd">Пароль:</label>
+                </div>
+                <div class="form-input">
+                  <input class="form-control"
+                         id="chapasswd"
+                         name="chapasswd"
+                         placeholder="введите свой пароль"
+                         autocomplete="current-password"
+                         required
+                         type="password">
+                </div>
+                <div class="footer-bottom"></div>
+              </div>
+              <div class="form-group">
+                <div class="form-input">
+                  <button type="button"
+                          class="btn btn-primary btn-block"
+                          id="chaddress-submit">
+                    Отправить запрос
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div id="changepwdf" class="entity-block to-be-hidden next-block">
+        <div class="actions-header">
+          <h2>Смена пароля</h2>
+        </div>
+        <div class="form-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Уважаемый <% user.username %>, для смены Вашего текущего пароля
+              заполните форму ниже. Введите в соответствующие поля Ваш текущий
+              пароль, придумайте и введите новый пароль, повторите ввод нового
+              пароля, затем нажмите кнопку "Сменить пароль", и Ваш текущий
+              пароль будет заменён на новый. В случае, если Вы забыли свой
+              текущий пароль, пароль можно восстановить в соответствующем
+              разделе сервиса, для этого нужно выйти из сервиса и проследовать
+              по ссылке в главном меню "Действия"->"Получить пароль".
+            </p>
+          </div>
+          <div class="form-form">
+            <form>
+              <div class="form-group">
+                <div class="form-label text-right">
+                  <label for="curpwd">Текущий пароль:</label>
+                </div>
+                <div class="form-input">
+                  <input id="curpwd"
+                         name="curpwd"
+                         class="form-control"
+                         placeholder="введите свой текущий пароль"
+                         autocomplete="currentpwd"
+                         required
+                         type="password">
+                </div>
+                <div class="footer-bottom"></div>
+              </div>
+              <div class="form-group">
+                <div class="form-label text-right">
+                  <label for="newpwd">Новый пароль:</label>
+                </div>
+                <div class="form-input">
+                  <input id="newpwd"
+                         name="newpwd"
+                         class="form-control"
+                         placeholder="введите новый пароль"
+                         autocomplete="newpwd"
+                         required
+                         type="password">
+                </div>
+                <div class="footer-bottom"></div>
+              </div>
+              <div class="form-group">
+                <div class="form-label text-right">
+                  <label for="newpwdconfirm">Повторить:</label>
+                </div>
+                <div class="form-input">
+                  <input id="newpwdconfirm"
+                         name="newpwdconfirm"
+                         class="form-control"
+                         placeholder="повторите новый пароль"
+                         autocomplete="newpwdconfirm"
+                         required
+                         type="password">
+                </div>
+                <div class="footer-bottom"></div>
+              </div>
+              <div class="form-group">
+                <div class="form-input">
+                  <button type="button"
+                          class="btn btn-primary btn-block"
+                          id="changepwd-submit">
+                    Поменять пароль
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div id="changeavaf" class="entity-block to-be-hidden next-block">
+        <div class="actions-header">
+          <h2>Ваш аватар</h2>
+        </div>
+        <div class="form-body">
+          <div class="avatar"
+               style="background:url(/ava/<% user.username %>/160)"></div>
+          <div id="upload-form">
+            <div class="today-field"></div>
+            <div class="form-help">
+              <p>
+                Выберите файл изображения, процесс выгрузки начнётся
+                автоматически. Поддерживаются файлы JPEG, PNG и GIF форматов.
+                Максимальный размер файла ограничен - 200КиБ. Размер
+                изображения не должен превышать 200х200 пикселей. После
+                выгрузки файл будет верифицирован, а изображение установлено
+                на Ваш аватар. Менять изображение можно любое количество раз.
+              </p>
+            </div>
+            <div class="form-form">
+              <form id="ava-form" class="form" method="POST"
+                    role="form" novalidate
+                    enctype="multipart/form-data">
+                <div class="form-group">
+                  <input accept="image/jpeg,image/png,image/gif"
+                         id="image"
+                         name="image"
+                         type="file">
+                </div>
+                <div class="form-group hidden">
+                  <input class="btn btn-default"
+                         id="image-submit"
+                         name="image-submit"
+                         type="submit"
+                         value="Выгрузить">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="entity-block next-block">
         <div class="actions-header">
           <h2>Действия</h2>
@@ -73,7 +259,7 @@
                   class="btn btn-default">
             Сменить пароль
           </button>
-          <button id="chageava"
+          <button id="changeava"
                   type="button"
                   class="btn btn-default">
             Сменить аватар
@@ -96,6 +282,8 @@
              'js/check-browser.js',
              'js/format-datetime.js',
              'js/render-lastseen.js',
+             'js/render-tf.js',
+             'js/scroll-panel.js',
              'js/people/profile.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
