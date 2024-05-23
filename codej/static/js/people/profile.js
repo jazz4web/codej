@@ -21,7 +21,6 @@ $(function() {
       username: username
     },
     success: function(data) {
-      console.log(data);
       if (token) {
         if (!data.cu || data.cu.brkey != checkBrowser()) {
           window.localStorage.removeItem('token');
@@ -39,9 +38,40 @@ $(function() {
         renderLastSeen($('#profile .last-seen'));
         if ($('.today-field').length) renderTF('.today-field', dt);
         checkMC(860);
+        if ($('#select-group').length) {
+          let s = $('#select-group option');
+          for (let n = 0; n < s.length; n++) {
+            if (s[n].value == data.user.group) {
+              $(s[n]).attr('selected', 'selected');
+          }
+        }
+        }
       }
     },
     dataType: 'json'
+  });
+  $('body').on('change', '#select-group', function() {
+    let res = $(this).val();
+    $.ajax({
+      method: 'POST',
+      url: '/api/profile',
+      data: {
+        group: res,
+        username: username,
+        auth: window.localStorage.getItem('token')
+      },
+      success: function(data) {
+        if (data.done) {
+          window.location.reload();
+        } else {
+          showError('#permissions', data)
+          $('#ealert').addClass('next-block');
+          scrollPanel($('#ealert'));
+          setTimeout(function() { checkMC(860);}, 300)
+        }
+      },
+      dataType: 'json'
+    });
   });
   $('body').on('click', '#chaddress-submit', function() {
     $(this).blur();

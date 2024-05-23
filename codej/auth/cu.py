@@ -3,6 +3,7 @@ import asyncio
 from ..api.tasks import ping_user
 from ..api.tokens import check_token
 from ..auth.attri import groups, weigh
+from ..common.flashed import set_flashed
 
 session = '''SELECT u,id, u.username, u.ugroup, u.weight, s.brkey
                FROM users AS u, sessions AS s

@@ -61,6 +61,38 @@
         <div class="footer-bottom"></div>
       </div>
     </div>
+    <% #chgroup %>
+      <div id="permissions" class="entity-block next-block">
+        <div class="actions-header">
+          <h2>Изменить группу <% user.username %></h2>
+        </div>
+        <div class="form-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Здесь можно изменить группу <b><% user.username %></b>.
+              Группа пользователя опеределяет его возможности в этом сервисе,
+              самый высокий статус у пользователей группы "Администраторы",
+              пользователям из группы "Изгои" запрещён даже вход в сервис.
+              Пользователи из группы "Комментаторы+" могут ставить пальчик
+              вниз, а "Комментаторы++" - создавать алиасы для ссылок.
+              Пользователи из группы "Писатели+" могут хранить изображения.
+              Пользователи из группы "Хранители+" могут блокировать топики
+              во всех блогах сервиса.
+            </p>
+          </div>
+          <div class="form-form">
+            <div class="form-group">
+              <select id="select-group" class="form-control">
+                <% #groups %>
+                  <option value="<% . %>"><% . %></option>
+                <% /groups %>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% /chgroup %>
     <% #owner %>
       <div id="changeemf" class="entity-block to-be-hidden next-block">
         <div class="actions-header">
