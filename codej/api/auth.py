@@ -16,13 +16,93 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .avas import check_img
 from .redi import extract_cache
-from .pg import check_address, create_session, filter_user
+from .pg import check_account, check_address, create_session, filter_user
 from .tasks import (
-    change_pattern, create_user, rem_old_session, request_passwd)
+    change_pattern, create_user, rem_old_session, remove_swap,
+    request_email_change, request_passwd)
 from .tokens import check_token, create_login_token
 from .tools import fix_bad_token
 
 BADCAPTCHA = 'Тест провален, либо устарел, попробуйте снова.'
+
+
+class ChangeEmail(HTTPEndpoint):
+    async def get(self, request):
+        res = {'done': None}
+        auth = request.headers.get('x-auth-token')
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if cu is None:
+            res['message'] = 'Необходима авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        token = request.headers.get('x-reg-token')
+        acc = await check_token(request.app.config, token)
+        if acc is None:
+            res['message'] = await fix_bad_token(request.app.config)
+            await conn.close()
+            return JSONResponse(res)
+        acc = await conn.fetchrow(
+            '''SELECT accounts.id, accounts.user_id, accounts.requested,
+                      accounts.swap, users.username, users.last_visit
+                 FROM accounts, users
+                 WHERE accounts.id = $1 AND accounts.user_id = users.id''',
+            acc.get('aid'))
+        if acc is None or cu['username'] != acc['username'] \
+                or acc['swap'] is None:
+            await conn.close()
+            res['message'] = 'Данные устарели, действие отменено.'
+            return JSONResponse(res)
+        await conn.execute(
+            '''UPDATE accounts SET address = $1, swap = $2
+                 WHERE id = $3''', acc['swap'], None, acc['id'])
+        await conn.close()
+        await set_flashed(
+            request, f'Уважаемый {cu["username"]}, у Вас новый адрес.')
+        res['done'] = True
+        return JSONResponse(res)
+
+
+class RequestEm(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        address, passwd, auth = (
+            d.get('address'), d.get('passwd'), d.get('auth'))
+        if not all((address, passwd, auth)):
+            res['message'] = 'Отправленные данные не прошли проверку.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if cu is None:
+            res['message'] = 'Действие требует авторизации.'
+            await conn.close()
+            return JSONResponse(res)
+        if pbkdf2_sha256.verify(
+                passwd, await conn.fetchval(
+                'SELECT password_hash FROM users WHERE id = $1',
+                cu.get('id'))):
+            account = await conn.fetchrow(
+                '''SELECT id, address, swap, requested, user_id
+                     FROM accounts WHERE user_id = $1''', cu.get('id'))
+            message = await check_account(
+                request.app.config, conn, account, address)
+            if message:
+                res['message'] = message
+                await conn.close()
+                return JSONResponse(res)
+            asyncio.ensure_future(
+                request_email_change(request, account, address, cu))
+            asyncio.ensure_future(
+                remove_swap(request.app.config, account))
+            res['done'] = True
+            await set_flashed(
+                request, 'На Ваш новый адрес выслано письмо с инструкциями.')
+            await conn.close()
+            return JSONResponse(res)
+        await conn.close()
+        res['message'] = 'Пароль недействителен.'
+        return JSONResponse(res)
 
 
 class ChangePasswd(HTTPEndpoint):

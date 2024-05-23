@@ -47,6 +47,13 @@ async def show_index(request):
     cu = await getcu(request, conn)
     await conn.close()
     realm = request.query_params.get('realm')
+    if realm == 'chem':
+        return request.app.jinja.TemplateResponse(
+            'main/chem.html',
+            {'request': request,
+             'key': request.query_params.get('key'),
+             'cu': cu,
+             'listed': True})
     if cu is None:
         if realm == 'gpasswd':
             return request.app.jinja.TemplateResponse(

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/chem.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",key="{{ key }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/main/index.js',
+             'js/format-footer.js',
+             'js/check-mc.js',
+             'js/close-topflashed.js',
+             'js/ping-user.js',
+             'js/slide-page.js',
+             'js/main/chem.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

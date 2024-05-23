@@ -16,11 +16,12 @@ from webassets.ext.jinja2 import assets
 from .dirs import base, static, templates, settings
 from .errors import show_error
 from .api.auth import (
-    ChangeAva, ChangePasswd, GetPasswd, Login,
-    Logout, LogoutAll, ResetPasswd, SetPasswd)
+    ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
+    Login, Logout, LogoutAll, ResetPasswd,
+    RequestEm, SetPasswd)
 from .api.main import Captcha, Index
 from .api.people import Profile
-from .api.tasks import rem_expired_sessions
+from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_index
 from .people.views import show_profile
@@ -78,6 +79,7 @@ class StApp(Starlette):
 
 async def run_before():
     await rem_expired_sessions(settings)
+    await check_swapped(settings)
 
 
 middleware = [
@@ -107,6 +109,8 @@ app = StApp(
             Route('/profile', Profile, name='aprofile'),
             Route('/change-ava', ChangeAva, name='chava'),
             Route('/change-passwd', ChangePasswd, name='chpwd'),
+            Route('/request-email-change', RequestEm, name='reemchange'),
+            Route('/change-email', ChangeEmail, name='change-email'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/{username}', show_profile, name='profile')]),

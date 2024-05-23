@@ -11,5 +11,6 @@ async def show_profile(request):
         {'request': request,
          'cu': cu,
          'listed': True,
+         'interval': request.app.config.get('REQUEST_INTERVAL', cast=int),
          'username': request.path_params.get('username'),
          'flashed': await get_flashed(request)})

@@ -5,6 +5,26 @@ from ..auth.attri import groups
 from ..common.random import get_unique_s
 
 
+async def check_account(config, conn, account, address):
+    length = timedelta(
+        seconds=round(3600*config.get('TOKEN_LENGTH', cast=float)))
+    interval = timedelta(
+        seconds=round(3600*config.get('REQUEST_INTERVAL', cast=float)))
+    if datetime.utcnow() - account.get('requested') < interval:
+        return 'Сервис временно недоступен, попробуйте зайти позже.'
+    if account.get('address') == address:
+        return 'Задан Ваш текущий адрес, запрос не имеет смысла.'
+    if await check_swap(conn, address, length):
+        return 'Адрес в свопе, выберите другой или повторите попытку позже.'
+    requested = await conn.fetchrow(
+        'SELECT requested, user_id FROM accounts WHERE address = $1', address)
+    if requested and requested.get('user_id'):
+        return 'Этот адрес уже зарегистрирован, запрос отклонён.'
+    if requested and datetime.utcnow() - requested.get('requested') < length:
+        return 'Адрес регистрируется, выберите другой или попробуйте позже.'
+    return None
+
+
 async def check_rel(conn, uid1, uid2):
     friend = bool(await conn.fetchrow(
         '''SELECT author_id, friend_id FROM friends
