@@ -18,3 +18,4 @@ MAIL_USERNAME=noreply@codej.ru
 MAIL_PASSWORD=############
 SUBJECT_PREFIX='[CodeJ ] '
 SENDER='robot <noreply@codej.ru>'
+ARTS_PER_PAGE=3

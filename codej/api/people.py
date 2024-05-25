@@ -3,10 +3,42 @@ from starlette.responses import JSONResponse
 
 from ..auth.attri import groups, kgroups, weigh
 from ..auth.cu import checkcu
+from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
-from .pg import check_rel, filter_target_user
+from .pg import check_last, check_rel, filter_target_user, select_users
 from .tools import check_profile_permissions
+
+
+class People(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'cu': await checkcu(
+            request, conn, request.headers.get('x-auth-token'))}
+        cu = res['cu']
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            'SELECT count(*) FROM users WHERE id != $1', cu.get('id'))
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        is_admin = cu.get('weight') == 255
+        await select_users(
+            request, conn, cu.get('id'), is_admin, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination'] and \
+                (res['pagination']['next'] or res['pagination']['prev']):
+            res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Profile(HTTPEndpoint):

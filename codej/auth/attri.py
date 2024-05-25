@@ -15,7 +15,7 @@ Group = namedtuple(
          'root'])
 groups = Group(pariah="Изгои",
                reader="Читатели",
-               commentator_="Комметаторы",
+               commentator_="Комментаторы",
                commentator="Комментаторы+",
                commentatorpro="Комментаторы++",
                blogger="Писатели",

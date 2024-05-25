@@ -1,8 +1,45 @@
+import math
+
 from datetime import datetime, timedelta
 from validate_email import validate_email
 
 from ..auth.attri import groups
+from ..common.aparsers import iter_pages
 from ..common.random import get_unique_s
+
+
+async def select_users(
+        request, conn, uid, is_admin, target, page, per_page, last):
+    if is_admin:
+        query = await conn.fetch(
+            '''SELECT username, ugroup, registered, last_visit
+                 FROM users WHERE id != $1
+                 ORDER BY last_visit DESC LIMIT $2 OFFSET $3''',
+            uid, per_page, per_page*(page-1))
+    else:
+        query = await conn.fetch(
+            '''SELECT username, ugroup, registered, last_visit
+                 FROM users WHERE id != $1 AND weight > 0
+                 ORDER BY last_visit DESC LIMIT $2 OFFSET $3''',
+            uid, per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['users'] = [
+            {'username': record.get('username'),
+             'group': record.get('ugroup'),
+             'last_visit': f'{record.get("last_visit").isoformat()}Z',
+             'registered': f'{record.get("registered").isoformat()}Z',
+             'ava': request.url_for(
+                 'ava', username=record.get('username'), size=98)._url}
+            for record in query]
+
+
+async def check_last(conn, page, per_page, *args):
+    num = await conn.fetchval(*args)
+    return math.ceil(num / per_page) or 1
 
 
 async def check_account(config, conn, account, address):

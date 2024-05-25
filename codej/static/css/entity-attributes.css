@@ -1,0 +1,28 @@
+.entity-attributes {
+  margin: 6px 0 0 0;
+}
+
+.author-avatar {
+  width: 98px;
+  height: 98px;
+  float: left;
+}
+
+.entity-info {
+  margin-left: 110px;
+  padding: 0;
+}
+
+.entity-info h4 {
+  margin: 0;
+}
+
+.author-profile-link {
+  color: dimgray;
+  font-style: italic;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.info-line-block {
+  margin: 4px 0 0;
+}

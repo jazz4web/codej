@@ -62,6 +62,12 @@
                 <li>
                   <a href="">Темы</a>
                 </li>
+                {%- if cu -%}
+                  <li role="separator" class="divider"></li>
+                  <li>
+                    <a href="{{ url_for('people:people') }}">Люди</a>
+                  </li>
+                {%- endif -%}
               </ul>
             </li>
           </ul>

@@ -59,7 +59,7 @@ body {
 }
 
 #footer-link {
-  color: cornsilk;
+  color: ivory;
   font-style: italic;
   text-decoration: none;
   text-shadow: 0 0 4px burlywood;
@@ -67,7 +67,8 @@ body {
 
 #footer-link:hover {
   cursor: pointer;
-  text-shadow: 0 0 0 ivory;
+  color: white;
+  text-shadow: 0 0 2px gainsboro;
 }
 
 .footer-right {

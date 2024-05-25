@@ -20,11 +20,11 @@ from .api.auth import (
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
 from .api.main import Captcha, Index
-from .api.people import Profile
+from .api.people import People, Profile
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_index
-from .people.views import show_profile
+from .people.views import show_people, show_profile
 
 try:
     from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION, MAIL_PASSWORD
@@ -111,8 +111,10 @@ app = StApp(
             Route('/change-passwd', ChangePasswd, name='chpwd'),
             Route('/request-email-change', RequestEm, name='reemchange'),
             Route('/change-email', ChangeEmail, name='change-email'),
+            Route('/people', People, name='apeople'),
             ]),
         Mount('/people', name='people', routes=[
+            Route('/', show_people, name='people'),
             Route('/{username}', show_profile, name='profile')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     on_startup=[run_before],
