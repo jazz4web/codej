@@ -1,0 +1,19 @@
+{% macro show_pv() %}
+  <div class="entity-pagination next-block text-center">
+    <ul class="pagination pagination-sm">
+      <% #pagination.prev %>
+        <li><a id="prev-link" href="#">&laquo;</a></li>
+      <% /pagination.prev %>
+      <% #pagination.pages %>
+        <li class="page-<% . %>">
+          <a class="page-link" href="#"><% . %></a>
+        </li>
+      <% /pagination.pages %>
+      <% #pagination.next %>
+        <li>
+          <a id="next-link" href="#">&raquo;</a>
+        </li>
+      <% /pagination.next %>
+    </ul>
+  </div>
+{% endmacro %}

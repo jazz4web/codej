@@ -27,7 +27,6 @@ $(function() {
           window.location.reload();
         }
       }
-      console.log(data);
       if (data.message) {
         let html = Mustache.render($('#ealertt').html(), data);
         $('#main-container').append(html);

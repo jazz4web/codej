@@ -68,7 +68,7 @@ body {
 #footer-link:hover {
   cursor: pointer;
   color: white;
-  text-shadow: 0 0 2px gainsboro;
+  text-shadow: 0 0 0 ivory;
 }
 
 .footer-right {
