@@ -15,6 +15,7 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import base, static, templates, settings
 from .errors import show_error
+from .aliases.views import show_aliases
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -97,6 +98,8 @@ app = StApp(
         Route('/favicon.ico', show_favicon, name='favicon'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
+        Mount('/aliases', name='aliases', routes=[
+            Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
             Route('/index', Index, name='aindex'),
             Route('/captcha', Captcha, name='acaptcha'),

@@ -30,23 +30,23 @@ kgroups = (groups.pariah, groups.reader, groups.commentator_,
 
 
 async def weigh(group):
-    if group == groups.pariah:
+    if group == groups.pariah:         # Запрет на вход в сервис
         return 0
-    if group == groups.reader:
+    if group == groups.reader:         # Чтение, Профиль, Лента
         return 30
-    if group == groups.commentator_:
+    if group == groups.commentator_:   #+ Комментарии
         return 45
-    if group == groups.commentator:
+    if group == groups.commentator:    #+ Дизлайки, Приваты
         return 50
-    if group == groups.commentatorpro:
+    if group == groups.commentatorpro: #+ Ссылки
         return 55
-    if group == groups.blogger:
+    if group == groups.blogger:        #+ Свой блог, Объявления
         return 100
-    if group == groups.bloggerpro:
+    if group == groups.bloggerpro:     #+ Хостинг картинок
         return 150
-    if group == groups.keeper:
+    if group == groups.keeper:         #+ Смена группы другим
         return 200
-    if group == groups.keeperpro:
+    if group == groups.keeperpro:      #+ Литовка блогов других авторов
         return 250
-    if group == groups.root:
+    if group == groups.root:           # Без ограничений
         return 255

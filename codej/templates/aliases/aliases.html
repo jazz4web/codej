@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Ваши ссылки{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/aliases/aliases.css',
+             'css/base.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
