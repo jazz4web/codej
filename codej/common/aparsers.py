@@ -1,3 +1,13 @@
+from urllib.parse import urlparse
+
+
+async def parse_url(url):
+    l = ''.join(urlparse(url)[1:])
+    if len(l) > 50:
+        l = l[:49] + '~'
+    return l
+
+
 async def iter_pages(page, last_page):
     if last_page <= 15:
         return list(range(1, last_page + 1))

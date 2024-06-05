@@ -13,6 +13,11 @@ from ..errors import E404
 from .tools import resize
 
 
+async def jump(request):
+    suffix = request.path_params.get('suffix')
+    return PlainTextResponse(f'{suffix}')
+
+
 async def show_avatar(request):
     size = request.path_params.get('size')
     if size < 22 or size > 160:

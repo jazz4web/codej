@@ -4,8 +4,30 @@ from datetime import datetime, timedelta
 from validate_email import validate_email
 
 from ..auth.attri import groups
-from ..common.aparsers import iter_pages
+from ..common.aparsers import iter_pages, parse_url
 from ..common.random import get_unique_s
+
+
+async def select_aliases(request, conn, uid, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT url, created, clicked, suffix FROM aliases
+             WHERE author_id = $1
+             ORDER BY created DESC LIMIT $2 OFFSET $3''',
+        uid, per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['aliases'] = [
+            {'url': record.get('url'),
+             'parsed': await parse_url(record.get('url')),
+             'created': f'{record.get("created").isoformat()}Z',
+             'clicked': record.get('clicked'),
+             'suffix': record.get('suffix'),
+             'alias': request.url_for(
+                 'jump', suffix=record.get('suffix'))._url}
+             for record in query]
 
 
 async def select_users(

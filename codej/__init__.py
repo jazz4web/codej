@@ -16,6 +16,7 @@ from webassets.ext.jinja2 import assets
 from .dirs import base, static, templates, settings
 from .errors import show_error
 from .aliases.views import show_aliases
+from .api.aliases import Aliases
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -24,7 +25,7 @@ from .api.main import Captcha, Index
 from .api.people import People, Profile
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
-from .main.views import show_avatar, show_favicon, show_index
+from .main.views import jump, show_avatar, show_favicon, show_index
 from .people.views import show_people, show_profile
 
 try:
@@ -96,6 +97,7 @@ app = StApp(
     routes=[
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
+        Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/aliases', name='aliases', routes=[
@@ -115,6 +117,7 @@ app = StApp(
             Route('/request-email-change', RequestEm, name='reemchange'),
             Route('/change-email', ChangeEmail, name='change-email'),
             Route('/people', People, name='apeople'),
+            Route('/aliases', Aliases, name='aaliases'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),
