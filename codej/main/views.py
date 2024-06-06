@@ -3,7 +3,8 @@ import functools
 import os
 
 from starlette.exceptions import HTTPException
-from starlette.responses import FileResponse, PlainTextResponse, Response
+from starlette.responses import (
+    FileResponse, PlainTextResponse, RedirectResponse, Response)
 
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
@@ -15,6 +16,29 @@ from .tools import resize
 
 async def jump(request):
     suffix = request.path_params.get('suffix')
+    conn = await get_conn(request.app.config)
+    if len(suffix) in (6, 7, 9, 10):
+        alias = await conn.fetchrow(
+            'SELECT url, clicked, author_id FROM aliases WHERE suffix = $1',
+            suffix)
+        if alias and alias.get('author_id'):
+            cu = await getcu(request, conn)
+            jumps = request.session.get('jumps', list())
+            if suffix not in jumps and \
+                    (not cu or cu.get('id') != alias.get('author_id')):
+                clicked = alias.get('clicked') + 1
+                if clicked > 9999:
+                    clicked = 9
+                await conn.execute(
+                    'UPDATE aliases SET clicked = $1 WHERE suffix = $2',
+                    clicked, suffix)
+                jumps.append(suffix)
+                if len(jumps) > 20:
+                    del jumps[0]
+                request.session['jumps'] = jumps
+            await conn.close()
+            return RedirectResponse(alias.get('url'), 301)
+    await conn.close()
     return PlainTextResponse(f'{suffix}')
 
 
