@@ -12,6 +12,40 @@ from .pg import check_last, select_aliases
 
 
 class Aliases(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'done': None}
+        d = await request.form()
+        suffix, page = d.get('suffix', ''), int(d.get('page', '0'))
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 55:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        if page >= 2:
+            url = request.url_for('aliases:aliases')._url + f'?page={page}'
+        else:
+            url = request.url_for('aliases:aliases')._url
+        alias = await conn.fetchrow(
+            'SELECT suffix FROM aliases WHERE suffix = $1 AND author_id = $2',
+            suffix, cu.get('id'))
+        if alias is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'DELETE FROM aliases WHERE suffix = $1 AND author_id = $2',
+            suffix, cu.get('id'))
+        await conn.close()
+        await set_flashed(request, 'Алиас успешно удалён.')
+        res['done'] = True
+        res['url'] = url
+        return JSONResponse(res)
+
     async def get(self, request):
         conn = await get_conn(request.app.config)
         res = {'cu': await checkcu(

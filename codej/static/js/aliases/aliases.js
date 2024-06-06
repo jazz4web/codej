@@ -44,6 +44,39 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '.remove-button', function() {
+      $(this).blur();
+      let p = page;
+      if ($('.remove-button').length == 1) p = p -1;
+      let suffix = $(this).data().suffix;
+      $.ajax({
+        method: 'DELETE',
+        url: '/api/aliases',
+        data: {
+          suffix: suffix,
+          page: p,
+          auth: window.localStorage.getItem('token')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.replace(data.url);
+          } else {
+            let html = Mustache.render($('#ealertt').html(), data);
+            $('#main-container').append(html);
+            if ($('#new-title').length) {
+              showError('#new-title', data);
+            } else {
+              showError('.entity-block', data);
+            }
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '.trash-button', function() {
+      $(this).blur();
+      showHideButton($(this), '.remove-button');
+    });
     $('body').on('click', '.page-link', function(event) {
       event.preventDefault();
       let th = $(this).parent();
