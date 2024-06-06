@@ -1,0 +1,17 @@
+.alias-info-block {
+  width: 80%;
+  float: left;
+  font-size: 0.9em;
+  font-style: italic;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.alias-options {
+  margin-left: 80%;
+  text-align: right;
+}
+
+.found-alias {
+  border: 1px solid lightsalmon;
+  box-shadow: 0 0 4px indianred;
+}

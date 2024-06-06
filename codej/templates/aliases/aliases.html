@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/_aliases.html" import show_alias %}
 {% from "macros/_common.html" import show_pv %}
 
 {%- block title_part -%}Ваши ссылки{%- endblock title_part -%}
@@ -15,7 +16,9 @@
              'css/next-block.css',
              'css/today-field.css',
              'css/form-help.css',
-             'css/inline-form.css' -%}
+             'css/inline-form.css',
+             'css/pagination.css',
+             'css/aliases.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
@@ -24,8 +27,7 @@
   {{- super() -}}
   <script id="aliasest" type="text/template">
     <% #extra %>
-      <div id="new-title" class="content-block entity-block
-                                 {% if flashed %}next-block{%- endif -%}">
+      <div id="new-title" class="content-block entity-block">
         <h1>Создайте новый алиас</h1>
         <div class="block-body">
           <div class="today-field"></div>
@@ -63,7 +65,7 @@
       </div>
     <% /extra %>
     <% #pagination.aliases %>
-      <!-- -->
+      {{ show_alias() }}
     <% /pagination.aliases %>
     <% ^pagination.aliases %>
       <div class="flashed-alert next-block">
@@ -73,6 +75,9 @@
     <% #pv %>
       {{- show_pv() -}}
     <% /pv %>
+  </script>
+  <script id="aliast" type="text/template">
+    {{ show_alias(f=True) }}
   </script>
 {%- endblock templates -%}
 
@@ -89,6 +94,9 @@
              'js/slide-page.js',
              'js/render-tf.js',
              'js/render-pv.js',
+             'js/show-error.js',
+             'js/check-next.js',
+             'js/copy-alias.js',
              'js/aliases/aliases.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

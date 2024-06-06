@@ -1,0 +1,51 @@
+{% macro show_alias(f=False) %}
+<div class="entity-block
+            {% if f %}found-alias next-block{% endif %}">
+    <div class="alias-info-block">
+      <table>
+        <tbody>
+          <tr>
+            <td>Ссылка:&nbsp;</td>
+            <td><a href="<% url %>"><% parsed %></a></td>
+          </tr>
+          <tr>
+            <td>Алиас:&nbsp;</td>
+            <td><a href="<% alias %>"><% alias %></a></td>
+          </tr>
+          <tr>
+            <td>Создан:&nbsp;</td>
+            <td class="date-field"><% created %></td>
+          </tr>
+          <tr>
+            <td>Переходов:&nbsp;</td>
+            <td><% clicked %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alias-options">
+      <button type="button"
+              title="удалить безвозвратно"
+              data-suffix="<% suffix %>"
+              class="btn btn-danger btn-sm remove-button to-be-hidden">
+        <span class="glyphicon glyphicon-remove-circle"
+              aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              title="удалить"
+              class="btn btn-default btn-sm trash-button">
+        <span class="glyphicon glyphicon-trash"
+              aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              title="скопировать в буфер обмена"
+              id="alias-<% suffix %>"
+              data-clipboard-text="<% alias %>"
+              class="btn btn-primary btn-sm copy-button">
+        <span class="glyphicon glyphicon-link"
+              aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="footer-bottom"></div>
+  </div>
+{% endmacro %}

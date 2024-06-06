@@ -3,7 +3,7 @@ import functools
 import os
 
 from starlette.exceptions import HTTPException
-from starlette.responses import FileResponse, Response
+from starlette.responses import FileResponse, PlainTextResponse, Response
 
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
