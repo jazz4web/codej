@@ -5,7 +5,8 @@ from ..api.tokens import check_token
 from ..auth.attri import groups, weigh
 from ..common.flashed import set_flashed
 
-session = '''SELECT u,id, u.username, u.ugroup, u.weight, s.brkey
+session = '''SELECT u,id, u.username, u.registered,
+                    u.ugroup, u.weight, s.brkey
                FROM users AS u, sessions AS s
                WHERE u.id = s.user_id AND s.suffix = $1'''
 old = 'DELETE FROM sessions WHERE suffix = $1'
@@ -27,6 +28,7 @@ async def checkcu(request, conn, token):
             return {'id': query.get('id'),
                     'username': query.get('username'),
                     'group': query.get('ugroup'),
+                    'registered': f'{query.get("registered").isoformat()}Z',
                     'weight': query.get('weight'),
                     'brkey': query.get('brkey'),
                     'ava': request.url_for(
@@ -52,6 +54,7 @@ async def getcu(request, conn):
                 ping_user(request.app.config, query.get('id')))
             return {'id': query.get('id'),
                     'username': query.get('username'),
+                    'registered': f'{query.get("registered").isoformat()}Z',
                     'group': query.get('ugroup'),
                     'weight': query.get('weight'),
                     'brkey': query.get('brkey'),

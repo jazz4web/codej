@@ -23,10 +23,12 @@ from .api.auth import (
     RequestEm, SetPasswd)
 from .api.main import Captcha, Index
 from .api.people import People, Profile
+from .api.pictures import Albums
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import jump, show_avatar, show_favicon, show_index
 from .people.views import show_people, show_profile
+from .pictures.views import show_albums
 
 try:
     from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION, MAIL_PASSWORD
@@ -118,10 +120,14 @@ app = StApp(
             Route('/change-email', ChangeEmail, name='change-email'),
             Route('/people', People, name='apeople'),
             Route('/aliases', Aliases, name='aaliases'),
+            Route('/pictures', Albums, name='aalbums'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),
             Route('/{username}', show_profile, name='profile')]),
+        Mount('/pictures', name='pictures', routes=[
+            Route('/', show_albums, name='albums'),
+            ]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     on_startup=[run_before],
     middleware=middleware,

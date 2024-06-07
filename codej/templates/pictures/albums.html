@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Ваши альбомы{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/pictures/albums.css',
+             'css/base.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/twopanels.css',
+             'css/statistic-table.css',
+             'css/aoptions.css',
+             'css/main-container.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  {%- if cu -%}
+    <script id="ustatt" type="text/template">
+      <h2>Ваша статистика</h2>
+      <div class="block-body album-statistic">
+        <table class="statistic-table">
+          <tbody>
+            <tr class="bordered">
+              <td>Здесь с:</td>
+              <td class="text-right date-field"><% cu.registered %></td>
+            </tr>
+            <tr class="bordered">
+              <td>Группа:</td>
+              <td class="text-right"><% cu.group %></td>
+            </tr>
+            <tr class="bordered">
+              <td>Альбомов:</td>
+              <td class="text-right"><% stat.albums %></td>
+            </tr>
+            <tr class="bordered">
+              <td>Файлов:</td>
+              <td class="text-right"><% stat.files %></td>
+            </tr>
+            <tr>
+              <td>Итого:</td>
+              <td class="text-right"><% stat.volume %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </script>
+    <script id="albumst" type="text/template">
+      <div id="left-panel" class="content-block">
+        <h2>Ваши альбомы</h2>
+        <div class="albums-options text-center">
+          <button type="button"
+                  id="user-home"
+                  class="btn btn-info btn-sm"
+                  data-uid="<% cu.id %>"
+                  title="показать статистику">
+            <span class="glyphicon glyphicon-home"
+                  aria-hidden="true"></span>
+          </button>
+          <button type="button"
+                  id="album-reload"
+                  class="btn btn-default btn-sm"
+                  title="обновить">
+            <span class="glyphicon glyphicon-refresh"
+                  aria-hidden="true"></span>
+          </button>
+          <% #extra %>
+            <button type="button"
+                    id="album-search"
+                    class="btn btn-info btn-sm"
+                    title="поиск">
+              <span class="glyphicon glyphicon-search"
+                    aria-hidden="true"></span>
+            </button>
+            <button type="button"
+                    id="create-new-album"
+                    class="btn btn-primary btn-sm"
+                    title="создать новый">
+              <span class="glyphicon glyphicon-folder-close"
+                    aria-hidden="true"></span>
+            </button>
+          <% /extra %>
+          <% ^extra %>
+            <button type="button"
+                    id="album-first-page"
+                    class="btn btn-default btn-sm"
+                    title="в начало">
+              <span class="glyphicon glyphicon-circle-arrow-left"
+                    aria-hidden="true"></span>
+            </button>
+          <% /extra %>
+        </div>
+        <% #extra %>
+          <div id="find-pic-block" class="to-be-hidden">
+            <div class="form-form">
+              <table class="inline-form-table">
+                <tbody>
+                  <tr>
+                    <td class="input-field">
+                      <input class="form-control"
+                             type="text"
+                             placeholder="введите суффикс изображения"
+                             id="find-input">
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>
+                      <button id="find-submit"
+                              class="btn btn-default"
+                              type="button">
+                        <span class="glyphicon glyphicon-search"
+                              aria-hidden="true"></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="create-form-block" class="to-be-hidden">
+            <div class="today-field"></div>
+            <div class="form-help">
+              <p>
+                Для создания нового альбома достаточно ввести его название
+                (от 3-х до 100-а знаков), выбрать статус и нажать кнопку
+                "Создать". Изображения из публичного альбома видны всем
+                пользователям сети, из скрытого альбома - только
+                авторизованным пользователям, из альбома для друзей - только
+                авторизованным пользователям из вашего списка друзей.
+              </p>
+            </div>
+            <div class="form-form">
+              <div id="title-group" class="form-group">
+                <div class="form-label text-right">
+                  <label for="title">Название:</label>
+                </div>
+                <div class="form-input">
+                  <input class="form-control"
+                         id="title"
+                         name="title"
+                         placeholder="введите название альбома"
+                         required
+                         type="text">
+                </div>
+                <div class="footer-bottom"></div>
+              </div>
+              <div class="form-group">
+                <div class="form-input checkbox">
+                  <label>
+                    <input id="pub-f"
+                           name="pub-f"
+                           type="checkbox"
+                           value="{{ status.pub }}"
+                           checked>
+                    <label for="pub-f">{{ status.pub }}</label>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-input checkbox">
+                  <label>
+                    <input id="priv-f"
+                           name="priv-f"
+                           value="{{ status.priv }}"
+                           type="checkbox">
+                    <label for="priv-f">{{ status.priv }}</label>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-input checkbox">
+                  <label>
+                    <input id="ffo-f"
+                           name="ffo-f"
+                           value="{{ status.ffo }}"
+                           type="checkbox">
+                    <label for="ffo-f">{{ status.ffo }}</label>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-input">
+                  <input class="btn btn-primary btn-block"
+                         id="create-new"
+                         name="create-new"
+                         type="button"
+                         value="Создать">
+                </div>
+              </div>
+            </div>
+          </div>
+        <% /extra %>
+        <% #pagination %>
+          <!-- -->
+        <% /pagination %>
+        <% ^pagination %>
+          <div id="no-albums" class="flashed-alert">
+            Альбомы пока не созданы.
+          </div>
+        <% /pagination %>
+      </div>
+      <div id="right-panel" class="content-block"></div>
+      <% #pv %>
+        <!-- -->
+      <% /pv %>
+      <% ^pv %>
+        <div class="footer-bottom"></div>
+      <% /pv %>
+    </script>
+  {%- endif -%}
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",page={{ page }};</script>
+  {%- assets filters='rjsmin', output='generic/js/pictures/albums.js',
+             'js/format-footer.js',
+             'js/check-mc.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/ping-user.js',
+             'js/check-browser.js',
+             'js/format-datetime.js',
+             'js/pictures/albums.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

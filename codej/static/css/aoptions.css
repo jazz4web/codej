@@ -1,0 +1,9 @@
+.albums-options {
+  margin: 6px 0 6px 0;
+  border: 1px solid gainsboro;
+  box-shadow: 0 0 4px gainsboro;
+  background-color: ivory;
+  background-image: linear-gradient(to top, ivory, ivory);
+  border-radius: 4px;
+  padding: 6px 0;
+}

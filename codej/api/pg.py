@@ -4,8 +4,38 @@ from datetime import datetime, timedelta
 from validate_email import validate_email
 
 from ..auth.attri import groups
-from ..common.aparsers import iter_pages, parse_url
+from ..common.aparsers import iter_pages, parse_title, parse_units, parse_url
 from ..common.random import get_unique_s
+
+
+async def get_user_stat(conn, uid):
+    return {'albums': await conn.fetchval(
+        'SELECT count(*) FROM albums WHERE author_id = $1', uid),
+            'files': await conn.fetchval(
+        '''SELECT count(*) FROM albums, pictures
+             WHERE author_id = $1
+             AND pictures.album_id = albums.id''', uid),
+            'volume': await parse_units(await conn.fetchval(
+        'SELECT sum(volume) FROM albums WHERE author_id = $1', uid) or 0)}
+
+
+async def select_albums(conn, uid, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT title, suffix FROM albums
+             WHERE author_id = $1
+             ORDER BY changed DESC LIMIT $2 OFFSET $3''',
+        uid, per_page, per_page*(page-1))
+    if query:
+        return {'page': page,
+                'next': page + 1 if page + 1 <= last else None,
+                'prev': page - 1 or None,
+                'pages': await iter_pages(page, last),
+                'albums': [{'title': record.get('title'),
+                            'parsed': await parse_title(
+                                record.get('title'), 40),
+                            'suffix': record.get('suffix')}
+                           for record in query]}
+    return None
 
 
 async def select_aliases(request, conn, uid, target, page, per_page, last):

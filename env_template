@@ -20,3 +20,4 @@ SUBJECT_PREFIX='[CodeJ ] '
 SENDER='robot <noreply@codej.ru>'
 ALIASES_PER_PAGE=3
 ARTS_PER_PAGE=3
+ALBUMS_PER_PAGE=3

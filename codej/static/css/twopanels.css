@@ -1,0 +1,12 @@
+#left-panel {
+  width: 60%;
+  float: left;
+  padding-right: 4px;
+  margin-bottom: 4px;
+}
+
+#right-panel {
+  margin-left: 60%;
+  padding-left: 4px;
+  border-left: 2px solid gainsboro;
+}

@@ -1,0 +1,20 @@
+.album-statistic {
+  margin: 6px 0 0 0;
+}
+
+.statistic-table {
+  margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-style: italic;
+  font-size: 0.9em;
+  text-shadow: 0 0 4px lightgray;
+}
+
+.statistic-table td {
+  padding: 6px 2px 2px;
+}
+
+.bordered {
+  border-bottom: 1px dotted gainsboro;
+}
