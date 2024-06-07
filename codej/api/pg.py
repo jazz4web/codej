@@ -8,6 +8,30 @@ from ..common.aparsers import iter_pages, parse_title, parse_units, parse_url
 from ..common.random import get_unique_s
 
 
+async def create_new_album(conn, uid, title, state):
+    now = datetime.utcnow()
+    suffix = await get_unique_s(conn, 'albums', 8)
+    empty = await conn.fetchval(
+        'SELECT id FROM albums WHERE author_id IS NULL')
+    if empty:
+        await conn.execute(
+            '''UPDATE albums SET title = $1,
+                                 created = $2,
+                                 changed = $2,
+                                 suffix = $3,
+                                 state = $4,
+                                 volume = 0,
+                                 author_id = $5 WHERE id = $6''',
+            title, now, suffix, state, uid, empty)
+    else:
+        await conn.execute(
+            '''INSERT INTO
+                 albums (title, created, changed, suffix, state, author_id)
+                 VALUES ($1, $2, $2, $3, $4, $5)''',
+            title, now, suffix, state, uid)
+    return suffix
+
+
 async def get_user_stat(conn, uid):
     return {'albums': await conn.fetchval(
         'SELECT count(*) FROM albums WHERE author_id = $1', uid),

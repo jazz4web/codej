@@ -28,7 +28,7 @@ from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import jump, show_avatar, show_favicon, show_index
 from .people.views import show_people, show_profile
-from .pictures.views import show_albums
+from .pictures.views import show_album, show_albums
 
 try:
     from .tuning import SECRET_KEY, SITE_NAME, SITE_DESCRIPTION, MAIL_PASSWORD
@@ -127,7 +127,7 @@ app = StApp(
             Route('/{username}', show_profile, name='profile')]),
         Mount('/pictures', name='pictures', routes=[
             Route('/', show_albums, name='albums'),
-            ]),
+            Route('/{suffix}', show_album, name='album')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     on_startup=[run_before],
     middleware=middleware,

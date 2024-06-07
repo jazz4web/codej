@@ -1,0 +1,26 @@
+.items-table-block {
+  margin: 0;
+}
+
+.items-table {
+  margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+  text-shadow: 0 0 4px lightgray;
+  font-size: 0.9em;
+}
+
+.album-header-panel {
+  padding: 6px 0 6px 6px;
+  width: 80%;
+  cursor: pointer;
+}
+
+.items-table td {
+  padding: 4px;
+}
+
+.clicked-item {
+  background-color: steelblue;
+  color: snow;
+}

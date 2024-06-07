@@ -1,0 +1,31 @@
+<div class="items-table-block">
+  <table class="items-table">
+    <tbody>
+      {% for album in pagination['albums'] %}
+        {% if loop.first and loop.last %}
+          {% set last_item = 1 %}
+        {% else %}
+          {% set last_item = 0 %}
+        {% endif %}
+        <tr {% if not loop.last %}class="bordered"{% endif %}>
+          <td class="album-header-panel"
+              data-suffix="{{ album['suffix'] }}"
+              {% if album['title']|length > 40 %}
+              title="{{ album['title'] }}"
+              {% endif %}>
+            {{ album['parsed'] }}
+          </td>
+          <td class="text-right album-tools-panel">
+            <button type="button"
+                    class="btn btn-sm btn-primary show-album"
+                    title="войти в альбом"
+                    data-dest="{{ album['suffix'] }}">
+              <span class="glyphicon glyphicon-folder-open"
+                    aria-hidden="true"></span>
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

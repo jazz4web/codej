@@ -1,0 +1,5 @@
+#create-form-block, #find-pic-block {
+  margin: 4px 0 0;
+  border-bottom: 2px solid gainsboro;
+  padding: 0 4px 4px 4px;
+}

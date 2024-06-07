@@ -12,7 +12,14 @@
              'css/twopanels.css',
              'css/statistic-table.css',
              'css/aoptions.css',
-             'css/main-container.css' -%}
+             'css/form-help.css',
+             'css/form-labeled.css',
+             'css/no-albums.css',
+             'css/inline-form.css',
+             'css/today-field.css',
+             'css/main-container.css',
+             'css/items-table-block.css',
+             'css/albums.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
@@ -194,7 +201,7 @@
           </div>
         <% /extra %>
         <% #pagination %>
-          <!-- -->
+          <%{ html.albums }%>
         <% /pagination %>
         <% ^pagination %>
           <div id="no-albums" class="flashed-alert">
@@ -224,6 +231,12 @@
              'js/ping-user.js',
              'js/check-browser.js',
              'js/format-datetime.js',
+             'js/scroll-panel.js',
+             'js/render-tf.js',
+             'js/checkbox.js',
+             'js/mark-input-error.js',
+             'js/reload.js',
+             'js/show-error.js',
              'js/pictures/albums.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
