@@ -6,7 +6,54 @@ from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..pictures.attri import status
-from .pg import check_last, create_new_album, get_user_stat, select_albums
+from .pg import (
+    check_last, create_new_album, get_album, get_user_stat, select_albums)
+
+
+class Ustat(HTTPEndpoint):
+    async def get(self, request):
+        res = {'stat': None}
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, request.headers.get('x-auth-token'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, необходима авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 150:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        res['stat'] = await get_user_stat(conn, cu.get('id'))
+        res['cu'] = cu
+        await conn.close()
+        return JSONResponse(res)
+
+
+class Albumstat(HTTPEndpoint):
+    async def get(self, request):
+        res = {'album': None}
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, request.headers.get('x-auth-token'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, необходима авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 150:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        suffix = request.query_params.get('suffix', None)
+        if suffix is None:
+            res['message'] = 'Не указан альбом.'
+            await conn.close()
+            return JSONResponse(res)
+        album = await get_album(conn, cu.get('id'), suffix)
+        await conn.close()
+        if album is None:
+            res['message'] = 'Альбом не существует.'
+            return JSONResponse(res)
+        res['album'] = album
+        return JSONResponse(res)
 
 
 class Albums(HTTPEndpoint):

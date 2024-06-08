@@ -20,7 +20,6 @@ $(function() {
     },
     headers: tee,
     success: function(data) {
-      console.log(data);
       if (token) {
         if (!data.cu || data.cu.brkey != checkBrowser()) {
           window.localStorage.removeItem('token');
@@ -38,6 +37,10 @@ $(function() {
         $('#right-panel').append(ust);
         formatDateTime($('.date-field'));
         if ($('.today-field').length) renderTF('.today-field', dt);
+        renderPV(data.pagination.page);
+        if ($('.entity-pagination').length) {
+          $('.entity-pagination').addClass('footer-bottom');
+        }
         checkMC(1152);
         let pub = $('#pub-f');
         pub.on('change', function() {
@@ -71,6 +74,49 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#album-first-page', function() {
+      $(this).blur();
+      window.location.assign('/pictures/');
+    });
+    $('body').on('click', '#user-home', function() {
+      $(this).blur();
+      let cform = $('#create-form-block');
+      let fform = $('#find-pic-block');
+      if (!cform.is(':hidden')) cform.slideUp('slow');
+      if (!fform.is(':hidden')) fform.slideUp('slow');
+      if ($('.clicked-item').length) {
+        $('.clicked-item').removeClass('clicked-item');
+        showUserStat();
+      }
+    });
+    $('body').on('click', '.album-header-panel', function() {
+      if (!$(this).hasClass('clicked-item')) {
+        let cform = $('#create-form-block');
+        let fform = $('#find-pic-block');
+        if (!cform.is(':hidden')) cform.slideUp('slow');
+        if (!fform.is(':hidden')) fform.slideUp('slow');
+        $('.clicked-item').removeClass('clicked-item');
+        $(this).addClass('clicked-item');
+        showAlbumStat($(this).data().suffix);
+      }
+    });
+    $('body').on('click', '.page-link', function(event) {
+      event.preventDefault();
+      let th = $(this).parent();
+      if (!th.hasClass('active')) {
+        window.location.assign('/pictures/?page=' + $(this).text().trim());
+      }
+    });
+    $('body').on('click', '#next-link', {page: page}, function(event) {
+      event.preventDefault();
+      let p = event.data.page + 1;
+      window.location.assign('/pictures/?page=' + p);
+    });
+    $('body').on('click', '#prev-link', {page: page}, function(event) {
+      event.preventDefault();
+      let p = event.data.page - 1;
+      window.location.assign('/pictures/?page=' + p);
+    });
     $('body').on('click', '.show-album', function() {
       $(this).blur();
       let url = '/pictures/' + $(this).data().dest;
@@ -88,7 +134,6 @@ $(function() {
             state: $('#create-form-block :checked').val()
           },
           success: function(data) {
-            console.log(data);
             if (data.done) {
               window.location.replace(data.target);
             } else {
@@ -115,7 +160,7 @@ $(function() {
         });
         if ($('.clicked-item').length) {
           $('.clicked-item').removeClass('clicked-item');
-          // showUserStat();
+          showUserStat();
         }
       } else {
         fblock.slideUp('slow', function() { checkMC(1152); });
@@ -138,7 +183,7 @@ $(function() {
         });
         if ($('.clicked-item').length) {
           $('.clicked-item').removeClass('clicked-item');
-          // showUserStat();
+          showUserStat();
         }
       } else {
         cform.slideUp('slow', function() { checkMC(1152); });
