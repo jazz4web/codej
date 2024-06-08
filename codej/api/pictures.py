@@ -7,7 +7,51 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..pictures.attri import status
 from .pg import (
-    check_last, create_new_album, get_album, get_user_stat, select_albums)
+    check_last, create_new_album, get_album, get_user_stat,
+    select_albums, select_pictures)
+
+
+class Album(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, request.headers.get('x-auth-token'))
+        res = {'cu': cu}
+        if cu is None:
+            res['message'] = 'Доступ ограничен, необходима авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 150:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        target = await get_album(
+            conn, cu.get('id'), request.path_params.get('suffix'))
+        if target is None:
+            res['message'] = 'У вас нет такого альбома.'
+            await conn.close()
+            return JSONResponse(res)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('PICTURES_PER_PAGE', cast=int, default=3),
+            'SELECT count(*) FROM pictures WHERE album_id = $1',
+            target.get('id'))
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        pagination = await select_pictures(
+            conn, target.get('id'), page,
+            request.app.config('PICTURES_PER_PAGE', cast=int, default=3),
+            last)
+        if pagination:
+            if pagination['next'] or pagination['prev']:
+                res['pv'] = True
+        res['album'], res['pagination'] = target, pagination
+        res['extra'] = res['pagination'] is None or \
+                (res['pagination'] and res['pagination']['page'] == 1)
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Ustat(HTTPEndpoint):

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/_pictures.html" import album_statistic %}
 
 {%- block title_part -%}Альбом {{ suffix }}{%- endblock title_part -%}
 
@@ -6,7 +7,145 @@
   {{- super() -}}
   {%- assets filters='cssmin', output='generic/css/pictures/album.css',
              'css/base.css',
-             'css/main-container.css' -%}
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/main-container.css',
+             'css/content-block.css',
+             'css/aoptions.css',
+             'css/no-albums.css',
+             'css/twopanels.css',
+             'css/form-help.css',
+             'css/today-field.css',
+             'css/form-labeled.css',
+             'css/next-block.css',
+             'css/statistic-table.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  {{ album_statistic(status) }}
+  <script id="albumt" type="text/template">
+    <div id="left-panel" class="content-block {% if flashed %}next-block
+                                {%- endif -%}">
+      <h2 <% #album.parse_t %>title="<% album.title %>"<% /album.parse_t %>>
+        <% album.parsed50 %>
+      </h2>
+      <div class="albums-options text-center">
+        <button type="button"
+                id="go-home"
+                class="btn btn-info btn-sm"
+                title="вернуться к списку альбомов">
+          <span class="glyphicon glyphicon-home"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                id="show-statistic"
+                class="btn btn-info btn-sm"
+                title="показать статистику альбома">
+          <span class="glyphicon glyphicon-repeat"
+                aria-hidden="true"></span>
+        </button>
+        <% #extra %>
+          <button type="button"
+                  id="album-reload"
+                  class="btn btn-default btn-sm"
+                  title="обновить">
+            <span class="glyphicon glyphicon-refresh"
+                  aria-hidden="true"></span>
+          </button>
+          <button type="button"
+                  id="upload-new"
+                  class="btn btn-primary btn-sm"
+                  title="добавить картинку">
+            <span class="glyphicon glyphicon-upload"
+                  aria-hidden="true"></span>
+          </button>
+        <% /extra %>
+        <% ^extra %>
+          <button type="button"
+                  id="album-first-page"
+                  class="btn btn-default btn-sm"
+                  target="в начало альбома">
+            <span class="glyphicon glyphicon-circle-arrow-left"
+                  aria-hidden="true"></span>
+          </button>
+        <% /extra %>
+      </div>
+      <% #extra %>
+        <div id="progress-block"
+             class="text-center">
+          <img alt="progress show"
+               width="48"
+               height="48"
+               src="{{ url_for('static', path='images/upload.gif') }}">
+        </div>
+        <div id="create-form-block">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Выберите файл изображения, процесс выгрузки начнётся
+              автоматически. Поддерживаются файлы JPEG, PNG и GIF форматов.
+              Максимальный размер файла ограничен - 5МиБ. Длина
+              имени файла не может превышать 128 символов. После загрузки
+              файл будет верифицирован и доступен в списке ниже.
+            </p>
+          </div>
+          <div class="form-form">
+            <form id="uploadform"
+                  class="form" method="POST"
+                  role="form" novalidate
+                  enctype="multipart/form-data">
+              <div class="form-group">
+                <input accept="image/jpeg,image/png,image/gif"
+                       id="image"
+                       name="image"
+                       type="file">
+              </div>
+              <div class="form-group hidden">
+                <input class="btn btn-default"
+                       id="image-submit"
+                       name="image-submit"
+                       type="submit"
+                       value="Отправить">
+              </div>
+            </form>
+          </div>
+        </div>
+      <% /extra %>
+      <% #pagination %>
+        <!-- -->
+      <% /pagination %>
+      <% ^pagination %>
+        <div id="no-albums" class="flashed-alert">
+          В альбоме пока нет изображений.
+        </div>
+      <% /pagination %>
+    </div>
+    <div id="right-panel" class="content-block"></div>
+    <% #pv %>
+      <!-- -->
+    <% /pv %>
+    <% ^pv %>
+      <div class="footer-bottom"></div>
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let suffix="{{ suffix }}",page={{ page }},cu ="{{ cu.username }}";
+  </script>
+  {%- assets filters='rjsmin', output='generic/js/pictures/album.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/check-mc.js',
+             'js/check-browser.js',
+             'js/slide-page.js',
+             'js/format-datetime.js',
+             'js/render-tf.js',
+             'js/pictures/album.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
