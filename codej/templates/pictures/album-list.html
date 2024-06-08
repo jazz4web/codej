@@ -1,0 +1,41 @@
+<div class="items-table-block">
+  <table class="items-table">
+    <tbody>
+    {% for pic in pagination['pictures'] %}
+      {% if loop.first and loop.last %}
+        {% set last_item = 1 %}
+      {% else %}
+        {% set last_item = 0 %}
+      {% endif %}
+      <tr {% if not loop.last %}class="bordered"{% endif %}>
+        <td class="album-header-panel"
+            data-suffix="{{ pic['suffix'] }}"
+            {% if pic['filename']|length > 38 %}
+            title="{{ pic['filename'] }}"
+            {% endif %}>
+          <span class="glyphicon glyphicon-picture"
+                aria-hidden="true"></span>
+          {{ pic['parsed40'] }}
+        </td>
+        <td class="text-right album-tools-panel">
+          <button type="button"
+                  class="btn btn-sm btn-danger remove-button
+                         to-be-hidden"
+                  data-suffix="{{ pic['suffix'] }}"
+                  data-last="{{ last_item }}"
+                  title="удалить безвозвратно">
+            <span class="glyphicon glyphicon-remove-circle"
+                  aria-hidden="true"></span>
+          </button>
+          <button type="button"
+                  class="btn btn-sm btn-default trash-button"
+                  title="удалить">
+            <span class="glyphicon glyphicon-trash"
+                  aria-hidden="true"></span>
+          </button>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

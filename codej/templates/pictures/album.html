@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/_common.html" import show_pv %}
 {% from "macros/_pictures.html" import album_statistic %}
 
 {%- block title_part -%}Альбом {{ suffix }}{%- endblock title_part -%}
@@ -18,6 +19,9 @@
              'css/today-field.css',
              'css/form-labeled.css',
              'css/next-block.css',
+             'css/pagination.css',
+             'css/items-table-block.css',
+             'css/albums.css',
              'css/statistic-table.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -27,8 +31,7 @@
   {{- super() -}}
   {{ album_statistic(status) }}
   <script id="albumt" type="text/template">
-    <div id="left-panel" class="content-block {% if flashed %}next-block
-                                {%- endif -%}">
+    <div id="left-panel" class="content-block">
       <h2 <% #album.parse_t %>title="<% album.title %>"<% /album.parse_t %>>
         <% album.parsed50 %>
       </h2>
@@ -115,7 +118,7 @@
         </div>
       <% /extra %>
       <% #pagination %>
-        <!-- -->
+        <%{ html.album }%>
       <% /pagination %>
       <% ^pagination %>
         <div id="no-albums" class="flashed-alert">
@@ -125,7 +128,7 @@
     </div>
     <div id="right-panel" class="content-block"></div>
     <% #pv %>
-      <!-- -->
+      {{- show_pv() -}}
     <% /pv %>
     <% ^pv %>
       <div class="footer-bottom"></div>
@@ -145,6 +148,9 @@
              'js/slide-page.js',
              'js/format-datetime.js',
              'js/render-tf.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
+             'js/render-pv.js',
              'js/pictures/album.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
