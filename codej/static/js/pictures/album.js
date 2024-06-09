@@ -55,6 +55,106 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body')
+    .on('click', '#album-first-page', {suffix: suffix}, function(event) {
+      $(this).blur();
+      window.location.assign('/pictures/' + event.data.suffix);
+    });
+    $('body').on('click', '.album-header-panel', function() {
+      if (!$(this).hasClass('clicked-item')) {
+        let form = $('#create-form-block');
+        if (!form.is(':hidden')) form.slideUp('slow');
+        $('.clicked-item').removeClass('clicked-item');
+        $('.remove-button').each(function() { $(this).fadeOut('slow'); });
+        $(this).addClass('clicked-item');
+        let token = window.localStorage.getItem('token');
+        let tee = token ? {'x-auth-token': token} : {};
+        $.ajax({
+          method: 'GET',
+          url: '/api/picstat',
+          headers: tee,
+          data: {
+            suffix: $(this).data().suffix
+          },
+          success: function(data) {
+            if (data.picture) {
+              let html = Mustache.render($('#picturet').html(), data);
+              $('#right-panel').empty().append(html);
+              formatDateTime($('.date-field'));
+              checkMC(1152);
+              let block_width = parseInt($('.album-statistic').width());
+              let pic_width = parseInt($('.picture-body img').attr('width'));
+              if (pic_width >= block_width) {
+                let pic_height = parseInt($('.picture-body img')
+                                          .attr('height'));
+                let width = block_width - 4;
+                let height = Math.round(pic_height / (pic_width / width));
+                $('.picture-body img').attr({
+                  "width": width, "height": height
+                });
+              }
+              $('#copy-button').on('click', {cls: '.album-form'}, copyThis);
+              $('#copy-button-b')
+                .on('click', {cls: '.album-form-b'}, copyThis);
+            } else {
+              let html = Mustache.render($('#ealertt').html(), data);
+              $('#main-container').append(html);
+              showError('#left-panel', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
+    $('body').on('click', '#go-home', function() {
+      $(this).blur();
+      window.location.assign('/pictures/');
+    });
+    $('body')
+    .on('click', '#show-statistic', {suffix: suffix}, function(event) {
+      $(this).blur();
+      let form = $('#create-form-block');
+      if (!form.is(':hidden')) form.slideUp('slow');
+      if ($('.clicked-item').length) {
+        $('.clicked-item').removeClass('clicked-item');
+        $('.remove-button').each(function() { $(this).fadeOut('slow'); });
+        showAlbumStat(event.data.suffix);
+      }
+    });
+    $('body').on('click', '#album-reload', reload);
+    $('body').on('click', '#upload-new', {suffix: suffix}, function(event) {
+      $(this).blur();
+      let upblock = $('#create-form-block');
+      if (!upblock.is(':hidden')) {
+        upblock.slideUp('slow');
+      } else {
+        if ($('.clicked-item').length) {
+          $('.clicked-item').removeClass('clicked-item');
+          $('.remove-button').each(function() { $(this).fadeOut('slow'); });
+          showAlbumStat(event.data.suffix);
+        }
+        upblock.slideDown('slow');
+        scrollPanel($('.albums-options'));
+      }
+    });
+    $('body').on('click', '.page-link', {suffix: suffix}, function(event) {
+      event.preventDefault();
+      window.location.assign(
+        '/pictures/' + event.data.suffix + '?page=' + $(this).text().trim());
+    });
+    $('body')
+    .on('click', '#next-link', {page: page, suffix: suffix}, function(event) {
+      event.preventDefault();
+      let p = event.data.page + 1;
+      window.location.assign('/pictures/' + event.data.suffix + '?page=' + p);
+    });
+    $('body')
+    .on('click', '#prev-link', {page: page, suffix: suffix}, function(event) {
+      event.preventDefault();
+      let p = event.data.page - 1;
+      window.location.assign('/pictures/' + event.data.suffix + '?page=' + p);
+    });
     $('body').on('change', '#image', {suffix: suffix}, function(event) {
       $('#ealert').remove();
       $('#upload-form-block').slideUp('slow', function() {

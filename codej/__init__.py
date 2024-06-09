@@ -23,10 +23,11 @@ from .api.auth import (
     RequestEm, SetPasswd)
 from .api.main import Captcha, Index
 from .api.people import People, Profile
-from .api.pictures import Album, Albums, Albumstat, Ustat
+from .api.pictures import Album, Albums, Albumstat, Picstat, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
-from .main.views import jump, show_avatar, show_favicon, show_index
+from .main.views import (
+    jump, show_avatar, show_favicon, show_index, show_picture)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 
@@ -102,6 +103,7 @@ app = StApp(
         Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
+        Route('/picture/{suffix}', show_picture, name='picture'),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
@@ -124,6 +126,7 @@ app = StApp(
             Route('/pictures/{suffix}', Album, name='aalbum'),
             Route('/albumstat', Albumstat, name='albumstat'),
             Route('/ustat', Ustat, name='austat'),
+            Route('/picstat', Picstat, name='apicstat'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),
