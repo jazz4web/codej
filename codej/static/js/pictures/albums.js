@@ -74,6 +74,14 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('change', '#select-status', {suffix: null}, changeStatus);
+    $('body').on('click', '#rename-album', {suffix: null}, renameAlbum);
+    $('body').on(
+      'keyup blur', '#title-change',
+      {min: 3, max: 100, block: '#rename-form'},
+      markInputError);
+    $('body').on('click', '#show-rename-form', showRenameForm);
+    $('body').on('click', '#show-state-form', showStateForm);
     $('body').on('click', '#album-first-page', function() {
       $(this).blur();
       window.location.assign('/pictures/');

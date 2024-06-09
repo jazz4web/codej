@@ -158,6 +158,56 @@ class Album(HTTPEndpoint):
         await conn.close()
         return JSONResponse(res)
 
+    async def put(self, request):
+        res = {'album': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('token'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, необходима авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 150:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        album = await get_album(
+            conn, cu.get('id'), suffix=request.path_params.get('suffix'))
+        if album is None:
+            res['message'] = 'Альбом не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        field, value = d.get('field', ''), d.get('value', '')
+        if field == 'state':
+            if value not in status:
+                res['message'] = 'Неизвестный статус альбома, отклонено.'
+                await conn.close()
+                return JSONResponse(res)
+            await set_flashed(request, 'Статус альбома успешно изменён.')
+        elif field == 'title':
+            rep = await conn.fetchrow(
+                '''SELECT title FROM albums
+                     WHERE title = $1 AND author_id = $2''',
+                value.strip(), cu.get('id'))
+            if rep:
+                res['message'] = 'Имя альбома занято, действие отклонено.'
+                await conn.close()
+                return JSONResponse(res)
+            if not value or len(value.strip()) > 100:
+                res['message'] = 'Имя альбома должно умещаться в 100 знаков.'
+                await conn.close()
+                return JSONResponse(res)
+            if album.get('title') == value.strip():
+                res['message'] = 'Запрос не имеет смысла.'
+                await conn.close()
+                return JSONResponse(res)
+            await set_flashed(request, 'Альбом успешно переименован.')
+        q = f'UPDATE albums SET {field} = $1 WHERE id = $2'
+        await conn.execute(q, value.strip(), album.get('id'))
+        await conn.close()
+        res['album'] = album.get('suffix')
+        return JSONResponse(res)
+
 
 class Ustat(HTTPEndpoint):
     async def get(self, request):

@@ -55,6 +55,38 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('change', '#select-status', {suffix: suffix}, changeStatus);
+    $('body').on('click', '#rename-album', {suffix: suffix}, renameAlbum);
+    $('body').on(
+      'keyup blur', '#title-change',
+      {min: 3, max: 100, block: '#rename-form'},
+      markInputError);
+    $('body').on('click', '#show-rename-form', showRenameForm);
+    $('body').on('click', '#show-state-form', showStateForm);
+    $('body').on('click', '.copy-md-code', function() {
+      $(this).blur();
+      $('.remove-button').each(function() { $(this).fadeOut('slow'); });
+      let sf = $('.album-form-b');
+      let ff = $('.album-form');
+      if (sf.is(':hidden')) {
+        sf.slideDown('slow');
+        ff.slideUp('slow');
+      } else {
+        sf.slideUp('slow');
+      }
+    });
+    $('body').on('click', '.copy-link', function() {
+      $(this).blur();
+      $('.remove-button').each(function() { $(this).fadeOut('slow'); });
+      let ff = $('.album-form');
+      let sf = $('.album-form-b');
+      if (ff.is(':hidden')) {
+        ff.slideDown('slow');
+        sf.slideUp('slow');
+      } else {
+        ff.slideUp('slow');
+      }
+    });
     $('body')
     .on('click', '#album-first-page', {suffix: suffix}, function(event) {
       $(this).blur();
