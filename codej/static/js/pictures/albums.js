@@ -74,6 +74,34 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#find-submit', function() {
+      $(this).blur();
+      let suffix = $('#find-input').val();
+      let token = window.localStorage.getItem('token');
+      let tee = token ? {'x-auth-token': token} : {};
+      if (suffix) {
+        $.ajax({
+          method: 'GET',
+          url: '/api/search',
+          headers: tee,
+          data: {
+            suffix: suffix
+          },
+          success: function(data) {
+            if (data.album) {
+              window.location.assign(data.album);
+            } else {
+              let html = Mustache.render($('#ealertt').html(), data);
+              $('#main-container').append(html);
+              showError('#left-panel', data);
+              scrollPanel($('#ealert'));
+              checkMC(1152);
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
     $('body').on('change', '#select-status', {suffix: null}, changeStatus);
     $('body').on('click', '#rename-album', {suffix: null}, renameAlbum);
     $('body').on(

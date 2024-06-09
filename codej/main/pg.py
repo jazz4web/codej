@@ -1,7 +1,7 @@
 from ..pictures.attri import status
 
 
-async def check_friends(conn, author, fiend):
+async def check_friends(conn, author, friend):
     if await conn.fetchrow(
             '''SELECT author_id, friend_id FROM friends
                  WHERE author_id = $1 AND friend_id = $2''', author, friend):

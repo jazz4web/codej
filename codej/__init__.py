@@ -23,7 +23,7 @@ from .api.auth import (
     RequestEm, SetPasswd)
 from .api.main import Captcha, Index
 from .api.people import People, Profile
-from .api.pictures import Album, Albums, Albumstat, Picstat, Ustat
+from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
 from .main.views import (
@@ -127,6 +127,7 @@ app = StApp(
             Route('/albumstat', Albumstat, name='albumstat'),
             Route('/ustat', Ustat, name='austat'),
             Route('/picstat', Picstat, name='apicstat'),
+            Route('/search', Search, name='asearch'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),

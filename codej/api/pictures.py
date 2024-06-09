@@ -17,6 +17,37 @@ from .pg import (
     get_user_stat, select_albums, select_pictures)
 
 
+class Search(HTTPEndpoint):
+    async def get(self, request):
+        res = {'album': None}
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, request.headers.get('x-auth-token'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, необходима авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 150:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        suffix = request.query_params.get('suffix')
+        if suffix is None:
+            res['message'] = 'Пустой запрос не имеет смысла.'
+            await conn.close()
+            return JSONResponse(res)
+        s = await conn.fetchval(
+            '''SELECT albums.suffix FROM albums, pictures
+                 WHERE albums.id = pictures.album_id
+                   AND pictures.suffix = $1 AND albums.author_id = $2''',
+            suffix, cu.get('id'))
+        await conn.close()
+        if s is None:
+            res['message'] = 'Нет такого файла.'
+            return JSONResponse(res)
+        res['album'] = request.url_for('pictures:album', suffix=s)._url
+        return JSONResponse(res)
+
+
 class Picstat(HTTPEndpoint):
     async def get(self, request):
         res = {'picture': None}
