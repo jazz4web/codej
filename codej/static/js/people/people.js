@@ -38,7 +38,7 @@ $(function() {
         $('.entity-block').each(checkNext);
         $('.date-field').each(function() { formatDateTime($(this)); });
         $('.last-seen').each(function() { renderLastSeen($(this)); });
-        renderPV(data.pagination.page);
+        if (data.pagination) renderPV(data.pagination.page);
         checkMC(860);
       }
     },

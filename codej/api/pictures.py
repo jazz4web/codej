@@ -6,7 +6,7 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
-from ..common.aparsers import parse_filename, parse_page
+from ..common.aparsers import parse_filename, parse_page, parse_redirect
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..common.random import get_unique_s
@@ -46,6 +46,46 @@ class Picstat(HTTPEndpoint):
 
 
 class Album(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'album': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('token'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 150:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        picture = await conn.fetchrow(
+            '''SELECT albums.volume AS avol,
+                      albums.suffix AS asuffix,
+                      pictures.volume AS pvol,
+                      pictures.album_id AS aid FROM albums, pictures
+                 WHERE albums.id = pictures.album_id
+                   AND albums.author_id = $1
+                   AND pictures.suffix = $2''',
+            cu.get('id'), d.get('picture'))
+        if picture is None:
+            res['message'] = 'Нет такого файла.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'UPDATE albums SET changed = $1, volume = $2 WHERE id = $3',
+            datetime.utcnow(), picture.get('avol') - picture.get('pvol'),
+            picture.get('aid'))
+        await conn.execute(
+            'DELETE FROM pictures WHERE suffix = $1', d.get('picture'))
+        await conn.close()
+        res['album'] = picture.get('asuffix')
+        res['url'] = await parse_redirect(
+            request, int(d.get('page', '1')), int(d.get('last', '0')),
+            'pictures:album', suffix=picture.get('asuffix'))
+        await set_flashed(request, 'Файл успешно удалён.')
+        return JSONResponse(res)
+
     async def get(self, request):
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, request.headers.get('x-auth-token'))
