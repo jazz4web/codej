@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from "macros/_drafts.html" import show_arts %}
+{% from "macros/_common.html" import show_pv %}
 
 {%- block title_part -%}Ваши черновики{%- endblock title_part -%}
 
@@ -13,8 +15,15 @@
              'css/form-help.css',
              'css/today-field.css',
              'css/inline-form.css',
+             'css/entity-attributes.css',
+             'css/entity-details.css',
+             'css/entity-summary.css',
+             'css/avatar.css',
+             'css/labels.css',
+             'css/personal-details.css',
              'css/next-block.css',
              'css/entity-block.css',
+             'css/pagination.css',
              'css/drafts.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -68,14 +77,14 @@
           Разрешение вести свой блог можно получить у администратора.
         </div>
       <% /canwrite %>
-{#      {{ show_arts('/drafts/', '/drafts/t/') }} #}
+      {{ show_arts('/drafts/', '/drafts/t/') }}
       <% ^pagination.articles %>
         <div class="flashed-alert next-block">
           На текущий момент у вас нет черновиков.
         </div
       <% /pagination.articles %>
       <% #pv %>
-        <!-- -->
+        {{- show_pv() -}}
       <% /pv %>
     </script>
   {% endif %}
@@ -95,6 +104,9 @@
              'js/mark-input-error.js',
              'js/show-error.js',
              'js/scroll-panel.js',
+             'js/format-datetime.js',
+             'js/render-pv.js',
+             'js/check-next.js',
              'js/drafts/drafts.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

@@ -1,0 +1,8 @@
+.entity-summary {
+  text-align: justify;
+}
+
+.entity-summary p {
+  margin: 0;
+  padding: 0;
+}

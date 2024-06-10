@@ -9,7 +9,6 @@ function showDrafts(dt, url, page) {
       page: page
     },
     success: function(data) {
-      console.log(data);
       if (token) {
         if (!data.cu || data.cu.brkey != checkBrowser()) {
           window.localStorage.removeItem('token');
@@ -24,6 +23,9 @@ function showDrafts(dt, url, page) {
         let html = Mustache.render($('#draftst').html(), data);
         $('#main-container').append(html);
         if ($('.today-field').length) renderTF('.today-field', dt);
+        $('.entity-block').each(checkNext);
+        $('.date-field').each(function() { formatDateTime($(this)); });
+        if (data.pv) renderPV(data.pagination.page);
         checkMC(860);
       }
     },

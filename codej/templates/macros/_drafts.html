@@ -1,0 +1,128 @@
+{% macro show_arts(apoint, lpoint) %}
+  <% #pagination.articles %>
+  <div class="content-block entity-block <% #extra %>next-block<% /extra %>">
+      <h2>
+        <a class="entity-link"
+           title="<% title %>"
+           href="{{ apoint }}<% slug %>"><% title80 %></a>
+      </h2>
+      <div class="entity-attributes">
+        <div class="author-avatar avatar"
+             style="background:url(<% ava %>)"></div>
+        <div class="entity-info">
+          <h4>
+            <a class="author-profile-link"
+               href="/people/<% author %>"><% author %></a>
+          </h4>
+          <div class="info-line-block personal-details">
+            <table>
+              <tbody>
+                <% #published %>
+                  <tr>
+                    <td>
+                      <span class="date-info">Опубликован:&nbsp;</span>
+                    </td>
+                    <td>
+                      <span class="date-info date-field">
+                        <% published %>
+                      </span>
+                    </td>
+                  </tr>
+                <% /published %>
+                <tr>
+                  <td>
+                    <span class="date-info">Отредактирован:&nbsp;</span>
+                  </td>
+                  <td>
+                    <span class="date-info date-field"><% edited %></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="date-info">Статус:&nbsp;</span>
+                  </td>
+                  <td>
+                    <span class="date-info"><% state %></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="footer-bottom"></div>
+      </div>
+      <div class="entity-details">
+        <table align="center" class="entity-details-table">
+          <tbody>
+          <tr>
+            <td>
+              <div class="labeled labeled-text labeled-info viewed-ind">
+                <span class="glyphicon glyphicon-eye-open"
+                      aria-hidden="true"></span><span
+                      class="value"><% viewed %></span>
+              </div>
+            </td>
+            <td>
+              <div class="labeled labeled-text
+                          labeled-success like-block">
+                <span class="glyphicon glyphicon-thumbs-up"
+                      aria-hidden="true"></span><span
+                      class="value"><% likes %></span>
+              </div>
+            </td>
+            <td>
+              <div class="labeled labeled-text
+                          labeled-danger dislike-block">
+                <span class="glyphicon glyphicon-thumbs-down"
+                      aria-hidden="true"></span><span
+                      class="value"><% dislikes %></span>
+              </div>
+            </td>
+            <td>
+              <div class="labeled labeled-text
+                          <% #commented %>labeled-info<% /commented %>
+                          <% ^commented %>
+                          labeled-warning<% /commented %>">
+                <span class="glyphicon glyphicon-comment"
+                      aria-hidden="true"></span><span
+                      class="value"><% commentaries %></span>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="entity-summary">
+        <% #summary %>
+          <p><% summary %></p>
+        <% /summary %>
+        <% ^summary %>
+          <div class="flashed-alert">
+            Черновик пока не имеет содержимого.
+          </div>
+        <% /summary %>
+      </div>
+      <div class="entity-alias">
+        <a class="btn btn-primary"
+           href="/<% suffix %>">подробности и комментарии</a>
+      </div>
+      <div class="entity-labels-block">
+        <table>
+          <tbody>
+            <tr>
+              <td>Метки:&nbsp;</td>
+              <td class="labels">
+                <% #labels %>
+                <a href="{{ lpoint }}<% . %>"><% . %></a>,
+                <% /labels %>
+                <% ^labels %>
+                  не забудьте установить метки.
+                <% /labels %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% /pagination.articles %>
+{% endmacro %}

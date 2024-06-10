@@ -12,6 +12,26 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDrafts(dt, '/api/drafts', page);
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '.entity-alias a', function(event) {
+      event.preventDefault();
+    });
+    $('body').on('click', '.page-link', function(event) {
+      event.preventDefault();
+      let th = $(this).parent();
+      if (!th.hasClass('active')) {
+        window.location.assign('/drafts/?page=' + $(this).text().trim());
+      }
+    });
+    $('body').on('click', '#next-link', {page: page}, function(event) {
+      event.preventDefault();
+      let p = event.data.page + 1;
+      window.location.assign('/drafts/?page=' + p);
+    });
+    $('body').on('click', '#prev-link', {page: page}, function(event) {
+      event.preventDefault();
+      let p = event.data.page - 1;
+      window.location.assign('/drafts/?page=' + p);
+    });
     $('body').on('click', '#title-submit', function() {
       let title = $('#title');
       title.blur();
