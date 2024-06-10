@@ -5,7 +5,7 @@ from ..auth.cu import checkcu
 from ..common.aparsers import parse_page
 from ..common.pg import get_conn
 from ..drafts.attri import status
-from .pg import check_last, select_drafts
+from .pg import check_last, create_d, select_drafts
 
 
 class Drafts(HTTPEndpoint):
@@ -40,4 +40,27 @@ class Drafts(HTTPEndpoint):
                 (res['pagination'] and res['pagination']['page'] == 1)
         res['canwrite'] = cu.get('weight') >= 100
         await conn.close()
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'draft': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        title = d.get('title', '')
+        if not title or len(title.strip()) > 100:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        slug = await create_d(conn, title.strip(), cu.get('id'))
+        await conn.close()
+        res['draft'] = request.url_for('drafts:draft', slug=slug)._url
         return JSONResponse(res)

@@ -27,7 +27,7 @@ from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
-from .drafts.views import show_drafts
+from .drafts.views import show_draft, show_drafts
 from .main.views import (
     jump, show_avatar, show_favicon, show_index, show_picture)
 from .people.views import show_people, show_profile
@@ -135,6 +135,7 @@ app = StApp(
             ]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),
+            Route('/{slug}', show_draft, name='draft'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),

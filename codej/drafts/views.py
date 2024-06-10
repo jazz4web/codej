@@ -4,6 +4,18 @@ from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 
 
+async def show_draft(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    return request.app.jinja.TemplateResponse(
+        'drafts/draft.html',
+        {'request': request,
+         'cu': cu,
+         'slug': request.path_params.get('slug'),
+         'listed': False,
+         'flashed': await get_flashed(request)})
+
+
 async def show_drafts(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
