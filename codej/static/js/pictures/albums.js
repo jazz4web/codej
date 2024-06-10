@@ -37,7 +37,7 @@ $(function() {
         $('#right-panel').append(ust);
         formatDateTime($('.date-field'));
         if ($('.today-field').length) renderTF('.today-field', dt);
-        if (data.pagination) renderPV(data.pagination.page);
+        if (data.pv) renderPV(data.pagination.page);
         if ($('.entity-pagination').length) {
           $('.entity-pagination').addClass('footer-bottom');
         }

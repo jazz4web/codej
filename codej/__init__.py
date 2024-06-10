@@ -22,7 +22,7 @@ from .api.auth import (
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
 from .api.main import Captcha, Index
-from .api.people import People, Profile
+from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
@@ -120,6 +120,7 @@ app = StApp(
             Route('/change-passwd', ChangePasswd, name='chpwd'),
             Route('/request-email-change', RequestEm, name='reemchange'),
             Route('/change-email', ChangeEmail, name='change-email'),
+            Route('/rel', Relation, name='arel'),
             Route('/people', People, name='apeople'),
             Route('/aliases', Aliases, name='aaliases'),
             Route('/pictures', Albums, name='aalbums'),

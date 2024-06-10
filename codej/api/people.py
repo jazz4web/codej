@@ -10,6 +10,58 @@ from .pg import check_last, check_rel, filter_target_user, select_users
 from .tools import check_profile_permissions
 
 
+class Relation(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограниен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            'SELECT id, username FROM users WHERE id = $1',
+            int(d.get('uid', '0')))
+        if target is None:
+            res['message'] = 'Запрос содержит неверные данные.'
+            await conn.close()
+            return JSONResponse(res)
+        rel = await check_rel(conn, cu.get('id'), target.get('id'))
+        if rel['friend']:
+            await conn.execute(
+                'DELETE FROM friends WHERE author_id = $1 AND friend_id = $2',
+                cu.get('id'), target.get('id'))
+            await set_flashed(
+                request, f'{target.get("username")} удалён из списка друзей.')
+        else:
+            message = None
+            if rel['blocker']:
+                message = '{0} заблокирован, действие отменено.'.format(
+                    target.get('username'))
+            if rel['blocked']:
+                message = '{0} заблокировал вас, действие отменено.'.format(
+                    target.get('username'))
+            if rel['blocker'] or rel['blocked']:
+                res['message'] = message
+                await conn.close()
+                return JSONResponse(res)
+            else:
+                await conn.execute(
+                    '''INSERT INTO friends (author_id, friend_id)
+                         VALUES ($1, $2)''', cu.get('id'), target.get('id'))
+                await set_flashed(
+                    request,
+                    f'{target.get("username")} добавлен в список друзей.')
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
 class People(HTTPEndpoint):
     async def get(self, request):
         conn = await get_conn(request.app.config)

@@ -50,91 +50,16 @@ $(function() {
     },
     dataType: 'json'
   });
-  $('body').on('change', '#select-group', function() {
-    let res = $(this).val();
-    $.ajax({
-      method: 'POST',
-      url: '/api/profile',
-      data: {
-        group: res,
-        username: username,
-        auth: window.localStorage.getItem('token')
-      },
-      success: function(data) {
-        if (data.done) {
-          window.location.reload();
-        } else {
-          showError('#permissions', data)
-          $('#ealert').addClass('next-block');
-          scrollPanel($('#ealert'));
-          setTimeout(function() { checkMC(860);}, 300)
-        }
-      },
-      dataType: 'json'
-    });
-  });
-  $('body').on('click', '#chaddress-submit', function() {
-    $(this).blur();
-    let tee = {
-      address: $('#chaddress').val(),
-      passwd: $('#chapasswd').val(),
-      auth: window.localStorage.getItem('token')
-    };
-    if (tee.address && tee.passwd && tee.auth) {
+  if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#make-friend', function() {
+      $(this).blur();
       $.ajax({
         method: 'POST',
-        url: '/api/request-email-change',
-        data: tee,
-        success: function(data) {
-          if (data.done) {
-            window.location.assign('/');
-          } else {
-            showError('#profile', data);
-            scrollPanel($('#ealert'));
-          }
+        url: '/api/rel',
+        data: {
+          auth: window.localStorage.getItem('token'),
+          uid: $(this).data().uid
         },
-        dataType: 'json'
-      });
-    }
-  });
-  $('body').on('click', '#changepwd-submit', function() {
-    $(this).blur();
-    let tee = {
-      passwd: $('#curpwd').val(),
-      newpwd: $('#newpwd').val(),
-      confirma: $('#newpwdconfirm').val(),
-      auth: window.localStorage.getItem('token')
-    };
-    if (tee.passwd && tee.newpwd && tee.confirma && tee.auth) {
-      $.ajax({
-        method: 'POST',
-        url: '/api/change-passwd',
-        data: tee,
-        success: function(data) {
-          if (data.done) {
-            window.location.assign('/');
-          } else {
-            showError('#profile', data);
-            scrollPanel($('#ealert'));
-          }
-        },
-        dataType: 'json'
-      });
-    }
-  });
-  $('body').on('change', '#image', function() {
-    $('#ealert').remove();
-    let file = $(this)[0].files[0];
-    if (file.size <= 204800) {
-      let fd = new FormData($('#ava-form')[0]);
-      fd.append('token', window.localStorage.getItem('token'));
-      $.ajax({
-        method: 'POST',
-        url: '/api/change-ava',
-        processData: false,
-        contentType: false,
-        cache: false,
-        data: fd,
         success: function(data) {
           if (data.done) {
             window.location.reload();
@@ -145,58 +70,155 @@ $(function() {
         },
         dataType: 'json'
       });
-    } else {
-      let d = {message: 'Недопустимый размер файла.'};
-      showError('#profile', d);
-      scrollPanel($('#ealert'));
-    }
-  });
-  $('body').on('click', '#emchange', function() {
-    $(this).blur();
-    let em = $('#changeemf');
-    if (em.is(':hidden')) {
-      $('#changeavaf').slideUp('slow');
-      $('#changepwdf').slideUp('slow');
-      em.slideDown('slow', function() {
-        scrollPanel(em);
-        checkMC(860);
+    });
+    $('body').on('change', '#select-group', function() {
+      let res = $(this).val();
+      $.ajax({
+        method: 'POST',
+        url: '/api/profile',
+        data: {
+          group: res,
+          username: username,
+          auth: window.localStorage.getItem('token')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#permissions', data)
+            $('#ealert').addClass('next-block');
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkMC(860);}, 300)
+          }
+        },
+        dataType: 'json'
       });
-    } else {
-      em.slideUp('slow', function() {
-        checkMC(860);
-      });
-    }
-  });
-  $('body').on('click', '#changepwd', function() {
-    $(this).blur();
-    let pwd = $('#changepwdf');
-    if (pwd.is(':hidden')) {
-      $('#changeavaf').slideUp('slow');
-      $('#changeemf').slideUp('slow');
-      pwd.slideDown('slow', function() {
-        scrollPanel(pwd);
-        checkMC(860);
-      });
-    } else {
-      pwd.slideUp('slow', function() {
-        checkMC(860);
-      });
-    }
-  });
-  $('body').on('click', '#changeava', function() {
-    $(this).blur();
-    let ava = $('#changeavaf');
-    if (ava.is(':hidden')) {
-      $('#changepwdf').slideUp('slow');
-      $('#changeemf').slideUp('slow');
-      ava.slideDown('slow', function() {
-        scrollPanel(ava);
-        checkMC(860);
-      });
-    } else {
-      ava.slideUp('slow', function() {
-        checkMC(860);
-      });
-    }
-  });
+    });
+    $('body').on('click', '#chaddress-submit', function() {
+      $(this).blur();
+      let tee = {
+        address: $('#chaddress').val(),
+        passwd: $('#chapasswd').val(),
+        auth: window.localStorage.getItem('token')
+      };
+      if (tee.address && tee.passwd && tee.auth) {
+        $.ajax({
+          method: 'POST',
+          url: '/api/request-email-change',
+          data: tee,
+          success: function(data) {
+            if (data.done) {
+              window.location.assign('/');
+            } else {
+              showError('#profile', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
+    $('body').on('click', '#changepwd-submit', function() {
+      $(this).blur();
+      let tee = {
+        passwd: $('#curpwd').val(),
+        newpwd: $('#newpwd').val(),
+        confirma: $('#newpwdconfirm').val(),
+        auth: window.localStorage.getItem('token')
+      };
+      if (tee.passwd && tee.newpwd && tee.confirma && tee.auth) {
+        $.ajax({
+          method: 'POST',
+          url: '/api/change-passwd',
+          data: tee,
+          success: function(data) {
+            if (data.done) {
+              window.location.assign('/');
+            } else {
+              showError('#profile', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
+    $('body').on('change', '#image', function() {
+      $('#ealert').remove();
+      let file = $(this)[0].files[0];
+      if (file.size <= 204800) {
+        let fd = new FormData($('#ava-form')[0]);
+        fd.append('token', window.localStorage.getItem('token'));
+        $.ajax({
+          method: 'POST',
+          url: '/api/change-ava',
+          processData: false,
+          contentType: false,
+          cache: false,
+          data: fd,
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('#profile', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      } else {
+        let d = {message: 'Недопустимый размер файла.'};
+        showError('#profile', d);
+        scrollPanel($('#ealert'));
+      }
+    });
+    $('body').on('click', '#emchange', function() {
+      $(this).blur();
+      let em = $('#changeemf');
+      if (em.is(':hidden')) {
+        $('#changeavaf').slideUp('slow');
+        $('#changepwdf').slideUp('slow');
+        em.slideDown('slow', function() {
+          scrollPanel(em);
+          checkMC(860);
+        });
+      } else {
+        em.slideUp('slow', function() {
+          checkMC(860);
+        });
+      }
+    });
+    $('body').on('click', '#changepwd', function() {
+      $(this).blur();
+      let pwd = $('#changepwdf');
+      if (pwd.is(':hidden')) {
+        $('#changeavaf').slideUp('slow');
+        $('#changeemf').slideUp('slow');
+        pwd.slideDown('slow', function() {
+          scrollPanel(pwd);
+          checkMC(860);
+        });
+      } else {
+        pwd.slideUp('slow', function() {
+          checkMC(860);
+        });
+      }
+    });
+    $('body').on('click', '#changeava', function() {
+      $(this).blur();
+      let ava = $('#changeavaf');
+      if (ava.is(':hidden')) {
+        $('#changepwdf').slideUp('slow');
+        $('#changeemf').slideUp('slow');
+        ava.slideDown('slow', function() {
+          scrollPanel(ava);
+          checkMC(860);
+        });
+      } else {
+        ava.slideUp('slow', function() {
+          checkMC(860);
+        });
+      }
+    });
+  }
 });

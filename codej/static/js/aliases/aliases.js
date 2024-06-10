@@ -37,7 +37,7 @@ $(function() {
         $('.entity-block').each(checkNext);
         $('.date-field').each(function() { formatDateTime($(this)); });
         $('.copy-button').on('click', copyAlias);
-        if (data.pagination) renderPV(data.pagination.page);
+        if (data.pv) renderPV(data.pagination.page);
         checkMC(860);
       }
     },

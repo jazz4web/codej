@@ -4,6 +4,16 @@ from ..auth.attri import groups, kgroups
 async def check_profile_permissions(request, cu, user, rel, data):
     data['rel'] = rel
     data['owner'] = cu.get('id') == user.get('uid')
+    data['acts'] = (cu.get('weight') >= 50 and user.get('weight') >= 50 and
+                    not rel['blocker'] and not rel['blocked']) or \
+                   (cu.get('weight') < 200 and user.get('weight') < 200) or \
+                   (cu.get('weight') >= 100 and 
+                    not rel['blocked'] and not rel['blocker'])
+    data['mfriend'] = cu.get('weight') >= 100 and not rel['blocked'] and \
+            not rel['blocker']
+    data['pm'] = cu.get('weight') >= 50 and user.get('weight') >= 50 and \
+            not rel['blocked'] and not rel['blocker']
+    data['block'] = cu.get('weight') < 200 and user.get('weight') < 200
     data['address'] = cu.get('id') == user.get('uid') or \
             (cu.get('weight') >= 200 and user.get('weight') < 250) or \
             cu.get('weight') >= 250

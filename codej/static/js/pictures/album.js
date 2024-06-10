@@ -39,7 +39,7 @@ $(function() {
         if ($('.today-field').length) renderTF('.today-field', dt);
         formatDateTime($('.date-field'));
         $('#progress-block').hide();
-        if (data.pagination) renderPV(data.pagination.page);
+        if (data.pv) renderPV(data.pagination.page);
         if ($('.entity-pagination').length) {
           $('.entity-pagination').addClass('footer-bottom');
         }
