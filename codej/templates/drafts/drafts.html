@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Ваши черновики{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/drafts/drafts.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/form-help.css',
+             'css/today-field.css',
+             'css/inline-form.css',
+             'css/next-block.css',
+             'css/entity-block.css',
+             'css/drafts.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  {% if cu %}
+    <script id="draftst" type="text/template">
+      <% #canwrite %>
+        <% #extra %>
+          <div id="new-title" class="content-block entity-block">
+            <h1>Новый топик для блога</h1>
+            <div class="block-body">
+              <div class="today-field"></div>
+              <div class="form-help">
+                <p>
+                  Здесь можно создать новый топик в блог, для этого достаточно
+                  заполнить форму ниже и нажать кнопку "Создать". Имейте ввиду,
+                  что заголовок обязателен и не может быть длинее, чем 100
+                  символов. Созданный топик можно будет наполнить содержимым
+                  и опубликовать.
+                </p>
+              </div>
+              <div class="form-form">
+                <table class="inline-form-table">
+                  <tbody>
+                    <tr>
+                      <td class="input-field">
+                        <input id="title"
+                               class="form-control"
+                               type="text"
+                               placeholder="введите заголовок топика">
+                      </td>
+                      <td>&nbsp;</td>
+                      <td>
+                        <button id="title-submit"
+                                class="btn btn-primary"
+                                type="button">Создать</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        <% /extra %>
+      <% /canwrite %>
+      <% ^canwrite %>
+        <div class="flashed-alert">
+          Разрешение вести свой блог можно получить у администратора.
+        </div>
+      <% /canwrite %>
+{#      {{ show_arts('/drafts/', '/drafts/t/') }} #}
+      <% ^pagination.articles %>
+        <div class="flashed-alert next-block">
+          На текущий момент у вас нет черновиков.
+        </div
+      <% /pagination.articles %>
+      <% #pv %>
+        <!-- -->
+      <% /pv %>
+    </script>
+  {% endif %}
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",page={{ page }};</script>
+  {%- assets filters='rjsmin', output='generic/js/drafts/drafts.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/check-mc.js',
+             'js/show-drafts.js',
+             'js/check-browser.js',
+             'js/slide-page.js',
+             'js/render-tf.js',
+             'js/drafts/drafts.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

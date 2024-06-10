@@ -21,11 +21,13 @@ from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
+from .api.drafts import Drafts
 from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .captcha.views import show_captcha
+from .drafts.views import show_drafts
 from .main.views import (
     jump, show_avatar, show_favicon, show_index, show_picture)
 from .people.views import show_people, show_profile
@@ -129,6 +131,10 @@ app = StApp(
             Route('/ustat', Ustat, name='austat'),
             Route('/picstat', Picstat, name='apicstat'),
             Route('/search', Search, name='asearch'),
+            Route('/drafts', Drafts, name='adrafts'),
+            ]),
+        Mount('/drafts', name='drafts', routes=[
+            Route('/', show_drafts, name='drafts'),
             ]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),

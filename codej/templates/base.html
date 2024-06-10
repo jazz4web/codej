@@ -79,6 +79,11 @@
                   <li>
                     <a href="{{ url_for('aliases:aliases') }}">Ссылки</a>
                   </li>
+                  {%- if cu['weight'] >= 100 -%}
+                    <li>
+                      <a href="{{ url_for('drafts:drafts') }}">Черновики</a>
+                    </li>
+                  {%- endif -%}
                   {%- if cu['weight'] >= 150 -%}
                     <li>
                       <a href="{{ url_for('pictures:albums') }}">Картинки</a>
