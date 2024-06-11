@@ -14,6 +14,13 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def change_draft(request, conn, did, field, value):
+    q = f'UPDATE articles SET {field} = $1 WHERE id = $2'
+    if field == 'meta':
+        value = value.strip()[:180]
+        await conn.execute(q, value, did)
+
+
 async def select_labeled_drafts(
         request, conn, uid, label, target, page, per_page, last):
     query = await conn.fetch(

@@ -9,7 +9,8 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
-    check_draft, check_last, create_d, select_drafts, select_labeled_drafts)
+    change_draft, check_draft, check_last, create_d,
+    select_drafts, select_labeled_drafts)
 
 
 class Labels(HTTPEndpoint):
@@ -133,6 +134,40 @@ class Draft(HTTPEndpoint):
         res['cens'] = target['state'] == status.cens
         res['keeper'] = cu.get('weight') >= 200
         res['draft'] = target
+        await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        field, value, slug = (
+            d.get('field', ''), d.get('value', ''), d.get('slug', ''))
+        if not all((field, value, slug)):
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchval(
+            'SELECT id FROM articles WHERE slug = $1 AND author_id = $2',
+            d.get('slug', ''), cu.get('id'))
+        if draft is None:
+            res['message'] = 'Черновик не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        s = await change_draft(request, conn, draft, field, value)
+        res['done'] = True
+        if s:
+            res['slug'] = s
+        await set_flashed(request, 'Изменено успешно.')
         await conn.close()
         return JSONResponse(res)
 
