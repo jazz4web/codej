@@ -19,6 +19,9 @@ async def change_draft(request, conn, did, field, value):
     if field == 'meta':
         value = value.strip()[:180]
         await conn.execute(q, value, did)
+    elif field == 'summary':
+        value = value.strip()[:512]
+        await conn.execute(q, value, did)
     elif field == 'title':
         value = value.strip()[:100]
         slug = await check_slug(conn, value)
