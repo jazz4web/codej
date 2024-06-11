@@ -1,0 +1,43 @@
+#topic-head h1 {
+  font-size: 1.2em;
+}
+
+.draft-alert {
+  margin: 4px 0 0 0;
+}
+
+.text-block {
+  margin: 4px 0 0 0;
+}
+
+#paragraph-editor {
+  margin: 0 0 4px;
+}
+
+#paragraph-editor textarea {
+  text-align: justify;
+  font-size: 12pt;
+}
+
+.editor-forms-block {
+  margin: 6px 0 0 0;
+  padding: 8px;
+}
+
+.editor-forms-block textarea {
+  text-align: justify;
+  font-size: 12pt;
+}
+
+.editor-forms-block input {
+  font-size: 12pt;
+}
+
+#new-paragraph-editor .form-group {
+  margin: 0;
+}
+
+#editor-opts {
+  padding: 0;
+  margin: 0 0 4px 0;
+}

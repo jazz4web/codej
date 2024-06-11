@@ -1,0 +1,19 @@
+.common-details {
+  margin: 4px 0 0 0;
+  font-style: italic;
+  text-align: center;
+  text-shadow 0 0 3px lightgray;
+}
+
+.entity-blog-link {
+  margin: 0;
+}
+
+.entity-details {
+  margin: 0 0 4px 0;
+}
+
+.entity-copy-link {
+  width: 40%;
+  margin: 0 auto 0 auto;
+}

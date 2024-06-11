@@ -5,7 +5,36 @@ from ..auth.cu import checkcu
 from ..common.aparsers import parse_page
 from ..common.pg import get_conn
 from ..drafts.attri import status
-from .pg import check_last, create_d, select_drafts
+from .pg import check_draft, check_last, create_d, select_drafts
+
+
+class Draft(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'draft': None,
+               'cu': await checkcu(
+                    request, conn, request.headers.get('x-auth-token'))}
+        slug, cu = request.query_params.get('slug', ''), res['cu']
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        target = dict()
+        await check_draft(request, conn, slug, cu.get('id'), target)
+        if not target:
+            res['message'] = 'Ничего не нашлось по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        res['length'] = await conn.fetchval(
+            'SELECT count(*) FROM paragraphs WHERE article_id = $1',
+            target.get('id'))
+        res['chstate'] = True if target['meta'] and target['summary'] and \
+                target['html'] and target['state'] != status.cens else False
+        res['cens'] = target['state'] == status.cens
+        res['keeper'] = cu.get('weight') >= 200
+        res['draft'] = target
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Drafts(HTTPEndpoint):

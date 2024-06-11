@@ -11,11 +11,11 @@ function regSubmit() {
       url: '/api/request-reg',
       data: tee,
       success: function(data) {
-        console.log(data);
         if (data.done) {
           window.location.replace('/');
         } else {
           showError('#regf', data);
+          scrollPanel($('#ealert'));
         }
       },
       dataType: 'json'

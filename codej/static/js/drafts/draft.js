@@ -10,5 +10,8 @@ $(function() {
   let dt = luxon.DateTime.now();
   formatFooter(dt);
   $('body').on('click', '.closeable', closeTopFlashed);
-  checkMC(860);
+  showDraft(slug, dt);
+  if (window.localStorage.getItem('token')) {
+    //pass;
+  }
 });

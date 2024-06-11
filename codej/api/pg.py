@@ -10,8 +10,24 @@ from ..common.aparsers import (
     iter_pages, parse_pic_filename, parse_title, parse_units, parse_url)
 from ..common.random import get_unique_s
 from ..drafts.attri import status
-from .parse import parse_arts_query
+from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
+
+
+async def check_draft(request, conn, slug, cuid, target):
+    query = await conn.fetchrow(
+        '''SELECT articles.id, articles.title, articles.slug,
+                  articles.suffix, articles.html, articles.summary,
+                  articles.meta, articles.published, articles.edited,
+                  articles.state, articles.commented, articles.viewed,
+                  articles.author_id, users.username
+             FROM articles, users
+             WHERE articles.slug = $1
+               AND articles.author_id = $2
+               AND users.id = articles.author_id''',
+        slug, cuid)
+    if query:
+        await parse_art_query(request, conn, query, target)
 
 
 async def check_slug(conn, title):

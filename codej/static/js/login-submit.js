@@ -18,6 +18,7 @@ function loginSubmit() {
           window.location.replace('/');
         } else {
           showError('#loginf', data);
+          scrollPanel($('#ealert'));
         }
       },
       dataType: 'json'
