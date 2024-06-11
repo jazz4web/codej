@@ -14,6 +14,25 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_labeled_drafts(
+        request, conn, uid, label, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.summary, a.published,
+                  a.edited, a.state, a.commented, a.viewed,
+                  users.username
+             FROM articles AS a, users, labels, als
+             WHERE a.author_id = users.id
+               AND a.author_id = $1
+               AND a.id = als.article_id
+               AND labels.label = $2
+               AND labels.id = als.label_id
+               AND a.state IN ($3, $4)
+            ORDER BY a.edited DESC LIMIT $5 OFFSET $6''',
+        uid, label, status.draft, status.cens, per_page, per_page*(page-1))
+    if query:
+        await parse_arts_query(request, conn, query, target, page, last)
+
+
 async def check_draft(request, conn, slug, cuid, target):
     query = await conn.fetchrow(
         '''SELECT articles.id, articles.title, articles.slug,

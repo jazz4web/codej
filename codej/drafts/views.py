@@ -4,6 +4,19 @@ from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 
 
+async def show_labeled(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    return request.app.jinja.TemplateResponse(
+        'drafts/labeled.html',
+        {'request': request,
+         'cu': cu,
+         'label': request.path_params.get('label'),
+         'page': await parse_page(request),
+         'listed': True,
+         'flashed': await get_flashed(request)})
+
+
 async def show_draft(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
