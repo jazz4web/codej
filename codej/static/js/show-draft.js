@@ -28,6 +28,11 @@ function showDraft(slug, dt) {
         $('#main-container').append(html);
         $('.date-field').each(function() { formatDateTime($(this)); });
         $('#copy-button').on('click', {cls: '#link-copy-form'}, copyThis);
+        let labels = $('#labels-edit').val().trim();
+        if (labels.slice(-1) === ',') labels = labels.slice(0, -1);
+        $('#labels-edit').val(labels);
+        let lhtml = $('.labels').html().trim().slice(0, -1);
+        $('.labels').html(lhtml);
         let s = $('#select-status option');
         for (let n = 0; n < s.length; n++) {
           if (s[n].value == data.draft.state) {

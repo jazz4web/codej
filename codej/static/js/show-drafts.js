@@ -25,6 +25,7 @@ function showDrafts(dt, url, page) {
         if ($('.today-field').length) renderTF('.today-field', dt);
         $('.entity-block').each(checkNext);
         $('.date-field').each(function() { formatDateTime($(this)); });
+        $('.labels').each(fixComma);
         if (data.pv) renderPV(data.pagination.page);
         checkMC(860);
       }
