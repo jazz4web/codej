@@ -30,8 +30,7 @@
   {{- super() -}}
   {%- if cu -%}
     <script id="draftt" type="text/template">
-      <div id="topic-head" class="content-block {% if flashed %}next-block
-                                  {%- endif -%}">
+      <div id="topic-head" class="content-block">
         <h1 title="<% draft.title %>">
           <% draft.title %>
         </h1>
@@ -383,6 +382,7 @@
              'js/show-error.js',
              'js/track-marker.js',
              'js/change-draft.js',
+             'js/mark-input-error.js',
              'js/drafts/draft.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

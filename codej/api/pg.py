@@ -19,6 +19,13 @@ async def change_draft(request, conn, did, field, value):
     if field == 'meta':
         value = value.strip()[:180]
         await conn.execute(q, value, did)
+    elif field == 'title':
+        value = value.strip()[:100]
+        slug = await check_slug(conn, value)
+        await conn.execute(
+            'UPDATE articles SET title = $1, slug = $2 WHERE id = $3',
+            value, slug, did)
+        return slug
 
 
 async def select_labeled_drafts(

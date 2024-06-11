@@ -12,6 +12,19 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug, dt);
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#title-submit', {slug: slug}, function(event) {
+      $(this).blur();
+      if (!$('.input-field').hasClass('has-error')) {
+        changeDraft('title', $('#title').val(), event.data.slug);
+      }
+    });
+    $('body').on(
+      'keyup blur', '#title',
+      {min: 3, max: 100, block: '.input-field'}, markInputError);
+    $('body').on('click', '#edit-title', function() {
+      $(this).blur();
+      changeForm('#entity-title-editor', '#title');
+    });
     $('body').on('click', '#metadesc-submit', {slug: slug}, function(event) {
       $(this).blur();
       if (!$('#metadesc-edit').parents('.form-group').hasClass('has-error')) {
