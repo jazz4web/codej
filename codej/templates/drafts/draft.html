@@ -19,6 +19,7 @@
              'css/form-help.css',
              'css/form-labeled.css',
              'css/inline-form.css',
+             'css/length-marker.css',
              'css/labels.css',
              'css/next-block.css',
              'css/errors.css',
@@ -362,6 +363,53 @@
         <% /keeper %>
       </div>
     </script>
+    <script id="eoptst" type="text/template">
+      <div id="editor-opts">
+        <button type="button"
+                class="btn btn-primary btn-xs edit-par"
+                title="редактировать"
+                data-num="<% num %>">
+          <span class="glyphicon glyphicon-edit"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                class="btn btn-primary btn-xs add-before"
+                title="добавить абзац выше"
+                data-num="<% num %>">
+          <span class="glyphicon glyphicon-upload"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                class="btn btn-danger btn-xs remove-par"
+                title="удалить абзац"
+                data-num="<% num %>">
+          <span class="glyphicon glyphicon-trash"
+                aria-hidden="true"></span>
+        </button>
+      </div>
+    </script>
+    <script id="peditort" type="text/template">
+      <div id="paragraph-editor"
+           class="to-be-hidden">
+        <div class="form-group">
+          <textarea id="paragraph-text-edit"
+                    placeholder="отредактируйте абзац топика"
+                    data-num="<% num %>"
+                    data-insert="<% insert %>"
+                    class="form-control"
+                    rows="5"><% text %></textarea>
+        </div>
+        <div class="form-group last-group">
+          <button id="cancel-edit"
+                  type="button"
+                  title="отменить"
+                  class="btn btn-info btn-sm">
+            <span class="glyphicon glyphicon-refresh"
+                  aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </script>
   {%- endif -%}
 {%- endblock templates -%}
 
@@ -391,6 +439,7 @@
              'js/adjust-frame.js',
              'js/adjust-image.js',
              'js/show-copy-form.js',
+             'js/send-edit.js',
              'js/drafts/draft.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
