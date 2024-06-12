@@ -10,8 +10,47 @@ from ..common.aparsers import (
     iter_pages, parse_pic_filename, parse_title, parse_units, parse_url)
 from ..common.random import get_unique_s
 from ..drafts.attri import status
+from .md import check_text, parse_md
 from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
+
+
+async def update_art(conn, did, loop, withdate=True):
+    pars = await conn.fetch(
+        '''SELECT mdtext FROM paragraphs
+             WHERE article_id = $1 ORDER BY num ASC''', did)
+    html = await loop.run_in_executor(
+        None, functools.partial(parse_md, pars))
+    if html:
+        if withdate:
+            await conn.execute(
+                'UPDATE articles SET html = $1, edited = $2 WHERE id = $3',
+                html, datetime.utcnow(), did)
+        else:
+            await conn.execute(
+                'UPDATE articles SET html = $1 WHERE id = $2', html, did)
+    return html
+
+
+async def save_par(conn, did, text, code):
+    loop = asyncio.get_running_loop()
+    text, spec = await loop.run_in_executor(
+        None, functools.partial(check_text, text, code))
+    if spec and text:
+        if await conn.fetchrow(
+                '''SELECT num FROM paragraphs
+                     WHERE mdtext = $1 AND article_id = $2''', text, did):
+            text = None
+    if text:
+        last = await conn.fetchval(
+            '''SELECT num FROM paragraphs
+                 WHERE article_id = $1 ORDER BY num DESC''', did)
+        if last is None:
+            last = -1
+        await conn.execute(
+            '''INSERT INTO paragraphs (num, mdtext, article_id)
+                 VALUES ($1, $2, $3)''', last+1, text, did)
+        return await update_art(conn, did, loop)
 
 
 async def change_draft(request, conn, did, field, value):

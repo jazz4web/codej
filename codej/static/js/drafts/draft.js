@@ -12,6 +12,21 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug, dt);
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '.copy-link', showCopyForm);
+    $('body').on('keyup', '#html-text-edit', {slug: slug}, function(event) {
+      let val = $(this).val().trim();
+      if (event.which == 13) {
+        const F = '```';
+        if (val.startsWith(F)) {
+          if (val.indexOf(F, 1) >= 4) {
+            val = val.slice(0, val.indexOf(F, 4)).trim() + '\n\n' + F;
+            sendPar(event.data.slug, val, 1);
+          }
+        } else if (val) {
+          sendPar(event.data.slug, val.replace('\n', ''), 0);
+        }
+      }
+    });
     $('body').on('click', '#summary-from-text', function() {
       $(this).blur();
       let l = $('.entity-text-block').children('p');

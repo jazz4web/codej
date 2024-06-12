@@ -21,7 +21,7 @@ from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
-from .api.drafts import Draft, Drafts, Labels
+from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
@@ -134,6 +134,7 @@ app = StApp(
             Route('/drafts', Drafts, name='adrafts'),
             Route('/draft', Draft, name='adraft'),
             Route('/labels', Labels, name='alabel'),
+            Route('/send-par', Paragraph, name='aparagraph'),
             ]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),

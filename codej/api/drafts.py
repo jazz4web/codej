@@ -10,7 +10,43 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     change_draft, check_draft, check_last, create_d,
-    select_drafts, select_labeled_drafts)
+    save_par, select_drafts, select_labeled_drafts)
+
+
+class Paragraph(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        slug, text, code = (
+            d.get('slug', ''), d.get('text', ''), int(d.get('code', '0')))
+        if not slug or not text:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchval(
+            'SELECT id FROM articles WHERE slug = $1 AND author_id = $2',
+            slug, cu.get('id'))
+        if draft is None:
+            res['message'] = 'Черновик не обнаружен.'
+            await conn.close()
+            return JSONResponse(res)
+        res['html'] = await save_par(conn, draft, text, code)
+        res['length'] = await conn.fetchval(
+            'SELECT count(*) FROM paragraphs WHERE article_id = $1',
+            draft)
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Labels(HTTPEndpoint):
