@@ -3,6 +3,7 @@ import re
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 
+from ..auth.attri import groups
 from ..auth.cu import checkcu
 from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
@@ -11,7 +12,7 @@ from ..drafts.attri import status
 from .pg import (
     change_draft, check_draft, check_last, create_d,
     edit_par, insert_par, remove_par, save_par,
-    select_drafts, select_labeled_drafts)
+    select_drafts, select_labeled_drafts, undress_art_links)
 
 
 class Paragraph(HTTPEndpoint):
@@ -286,6 +287,35 @@ class Draft(HTTPEndpoint):
         res['cens'] = target['state'] == status.cens
         res['keeper'] = cu.get('weight') >= 200
         res['draft'] = target
+        await conn.close()
+        return JSONResponse(res)
+
+    async def patch(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchrow(
+            'SELECT id, author_id FROM articles WHERE slug = $1',
+            d.get('slug', ''))
+        if draft is None:
+            res['message'] = 'Ничего не нашлось по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        if (cu.get('id') == draft.get('author_id') and
+            cu.get('weight') < 200) or \
+                    (cu.get('id') != draft.get('author_id') and
+                     cu.get('group') != groups.root):
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        res['done'] = True
+        await undress_art_links(conn, draft.get('id'))
+        await set_flashed(request, 'Атрибут у ссылок удалён.')
         await conn.close()
         return JSONResponse(res)
 

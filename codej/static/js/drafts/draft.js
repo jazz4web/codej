@@ -12,6 +12,22 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug, dt);
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#special-case', {slug: slug}, function(event) {
+      $(this).blur();
+      undressLinks(event.data.slug);
+    });
+    $('body').on('click', '#comments-state', {slug: slug}, function(event) {
+      $(this).blur();
+      changeDraft('commented', 'empty', event.data.slug);
+    });
+    $('body').on('change', '#select-status', {slug: slug}, function(event) {
+      changeDraft('state', $('#select-status').val(), event.data.slug);
+    });
+    $('body').on('click', '#state-button', function() {
+      $(this).blur();
+      changeForm('#status-editor', '#select-status');
+    });
+    $('body').on('click', '.entity-text-block img', clickImage);
     $('body').on('click', '.edit-par', {slug: slug}, function(event) {
       $(this).blur();
       let par = $(this).parent().next();
@@ -246,6 +262,5 @@ $(function() {
       changeForm('#labels-editor', '#labels-edit');
     });
     $('body').on('click', '#move-screen-up', moveScreenUp);
-    //pass;
   }
 });

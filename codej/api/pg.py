@@ -15,6 +15,18 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def undress_art_links(conn, did):
+    pars = await conn.fetch(
+        '''SELECT mdtext FROM paragraphs
+             WHERE article_id = $1 ORDER BY num ASC''', did)
+    loop = asyncio.get_running_loop()
+    html = await loop.run_in_executor(
+        None, functools.partial(parse_md, pars, sc=True))
+    if html:
+        await conn.execute(
+            'UPDATE articles SET html = $1 WHERE id = $2', html, did)
+
+
 async def edit_par(conn, did, text, num, code):
     cur = await conn.fetchval(
         'SELECT mdtext FROM paragraphs WHERE num = $1 AND article_id = $2',
@@ -132,9 +144,27 @@ async def change_draft(request, conn, did, field, value):
     if field == 'meta':
         value = value.strip()[:180]
         await conn.execute(q, value, did)
+    elif field == 'state':
+        if value in status:
+            await conn.execute(q, value, did)
+            published = await conn.fetchrow(
+                'SELECT published, author_id FROM articles WHERE id = $1', did)
+            if published.get('published') is None and \
+                    value in (status.pub, status.priv, status.ffo):
+                now = datetime.utcnow()
+                await conn.execute(
+                    '''UPDATE articles SET published = $1, edited = $1
+                         WHERE id = $2''', now, did)
+                await conn.execute(
+                    'UPDATE users SET last_published = $1 WHERE id = $2',
+                    now, published.get('author_id'))
     elif field == 'summary':
         value = value.strip()[:512]
         await conn.execute(q, value, did)
+    elif field == 'commented':
+        value = await conn.fetchval(
+            'SELECT commented FROM articles WHERE id = $1', did)
+        await conn.execute(q, not value, did)
     elif field == 'title':
         value = value.strip()[:100]
         slug = await check_slug(conn, value)
