@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{%- block metas -%}
+  {{- super() -}}
+  <meta name="description" content="{{ topic['meta'] }}">
+  <meta name="keywords" content="{%- for label in topic['labels'] -%}
+                                 {{- label -}}{%- if not loop.last -%}{{ ", "}}
+                                 {%- endif -%}{%- endfor -%}">
+{%- endblock metas -%}
+
+{%- block title_part -%}{{ topic['title'] }}{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{ super() }}
+  {%- assets filters='cssmin', output='generic/css/main/show-public.css',
+             'css/base.css',
+             'css/content-block.css',
+             'css/entity-attributes.css',
+             'css/personal-details.css',
+             'css/avatar.css',
+             'css/common-details.css',
+             'css/entity-details.css',
+             'css/entity-text-block.css',
+             'css/form-labeled.css',
+             'css/labels.css',
+             'css/pygments.css',
+             'css/main-container.css',
+             'css/public.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+  <link rel="canonical" href="{{ url_for('public', slug=topic['slug']) }}">
+{%- endblock styles -%}
+
+{%- block page_body -%}
+  <div id="topic-head" class="content-block">
+    <h1 title="{{ topic['title'] }}">
+      {{ topic['title'] }}
+    </h1>
+    <div class="entity-attributes">
+      <div class="author-avatar avatar"
+           style="background:url({{ topic['ava'] }})"></div>
+      <div class="entity-info">
+        <h4>
+          <a class="author-profile-link"
+             href="{{ url_for('people:profile', username=topic['author']) }}">
+             {{ topic['author'] }}
+          </a>
+        </h4>
+        <div class="info-line-block personal-details">
+          <table>
+            <tbody>
+              {% if topic['published'] %}
+              <tr>
+                <td><span class="date-info">Опубликован:&nbsp;</span></td>
+                <td><span
+                  class="date-info date-field">{{ topic['published'] }}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <td><span
+                  class="date-info">Отредактирован:&nbsp;</span></td>
+                <td><span
+                  class="date-info date-field">{{ topic['edited'] }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="date-info">Статус:&nbsp;</span></td>
+                <td><span class="date-info">{{ topic['state'] }}</span>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="footer-bottom"></div>
+    </div>
+  </div>
+  <div class="common-details">
+    <div class="entity-blog-link">
+      <a href="/arts/a/{{ topic['author'] }}">{{ topic['author'] }}&nbsp;блог</a>
+    </div>
+    <div class="entity-details">
+      <table align="center" class="entity-details-table">
+        <tbody>
+          <tr>
+            <td>
+              <div class="labeled labeled-text labeled-info viewed-ind"
+                   title="количество просмотров">
+                <span class="glyphicon glyphicon-eye-open"
+                      aria-hidden="true"></span><span
+                      class="value">{{ topic['viewed'] }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="labeled labeled-text labeled-success like-block"
+                   title="количество нра">
+                <span class="glyphicon glyphicon-thumbs-up"
+                      aria-hidden="true"></span><span
+                      class="value">{{ topic['likes'] }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="labeled labeled-text labeled-danger dislike-block"
+                   title="количество ненра">
+                <span class="glyphicon glyphicon-thumbs-down"
+                      aria-hidden="true"></span><span
+                      class="value">{{ topic['dislikes'] }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="labeled labeled-text
+                            {% if topic['commented'] %}labeled-info
+                            {% else %}labeled-warning{% endif %}"
+                   title="количество комментариев">
+                <span class="glyphicon glyphicon-comment"
+                      aria-hidden="true"></span><span
+                      class="value">{{ topic['commentaries'] }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="entity-copy-link">
+      <button type="button"
+              class="btn btn-xs btn-default btn-block copy-link">
+        поделиться ссылкой
+      </button>
+      <div id="link-copy-form" class="to-be-hidden">
+        <div class="form-group">
+          <input id="copy-box"
+                 class="form-control"
+                 type="text"
+                 name="copy-box"
+                 value="{{ topic['jump'] }}">
+        </div>
+        <div class="form-group">
+          <button id="copy-button"
+                  type="button"
+                  data-clipboard-target="#copy-box"
+                  class="btn btn-xs btn-primary btn-block">
+            скопировать в буфер обмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-block entity-text-block">
+    {{ topic['html']|safe }}
+  </div>
+  <div class="entity-labels-block">
+    <table>
+      <tbody>
+        <tr>
+          <td>Метки:&nbsp;</td>
+          <td class="labels">
+            {% if topic['labels'] %}
+              {% for label in topic['labels'] %}
+              <a href="{#{{ url_for(
+                 'blogs:blog-l', username=topic['author'], label=label) }}#}">
+                {{- label -}}</a>{%- if not loop.last -%}, {%- endif -%}
+              {% endfor %}
+            {% else %}
+              автор не установил метки.
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{%- endblock page_body -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let suffix="{{ topic['suffix'] }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/main/show-public.js',
+             'js/format-footer.js',
+             'js/check-mc.js',
+             'js/format-datetime.js',
+             'js/show-copy-form.js',
+             'js/copy-this.js',
+             'js/adjust-frame.js',
+             'js/set-margin.js',
+             'js/adjust-image.js',
+             'js/click-image.js',
+             'js/ping-user.js',
+             'js/count-clicks.js',
+             'js/main/show-public.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{% endblock scripts -%}

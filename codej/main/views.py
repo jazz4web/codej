@@ -12,8 +12,43 @@ from ..common.pg import get_conn
 from ..dirs import static
 from ..errors import E404
 from ..pictures.attri import status
-from .pg import check_state
+from .pg import check_state, check_topic
 from .tools import resize
+
+
+async def show_sitemap(request):
+    conn = await get_conn(request.app.config)
+    arts = await conn.fetch(
+         '''SELECT slug, published, edited FROM articles
+              WHERE state = $1 ORDER BY published DESC LIMIT 250''',
+         status.pub)
+    await conn.close()
+    response = request.app.jinja.TemplateResponse(
+         'main/sitemap.xml',
+         {'request': request,
+          'arts': arts})
+    response.media_type = 'application/xml'
+    response.headers['content-type'] = 'application/xml'
+    return response
+
+
+async def show_public(request):
+    slug = request.path_params.get('slug')
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    if cu:
+        return RedirectResponse(request.url_for('arts:art', slug=slug), 301)
+    topic = dict()
+    await check_topic(request, conn, slug, topic)
+    await conn.close()
+    if not topic:
+        raise HTTPException(
+            status_code=404, detail='Такой страницы у нас нет.')
+    return request.app.jinja.TemplateResponse(
+        'main/show-public.html',
+        {'request': request,
+         'topic': topic,
+         'listed': False})
 
 
 async def show_picture(request):

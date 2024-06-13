@@ -1,4 +1,18 @@
+from ..api.parse import parse_art_query
+from ..drafts.attri import status as statusd
 from ..pictures.attri import status
+
+
+async def check_topic(request, conn, slug, target):
+    query = await conn.fetchrow(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.html, a.summary,
+                  a.meta, a.published, a.edited, a.state, a.commented,
+                  a.viewed, a.author_id, u.username
+             FROM articles AS a, users AS u
+             WHERE a.slug = $1 AND a.state = $2 AND u.id = a.author_id''',
+        slug, statusd.pub)
+    if query:
+        await parse_art_query(request, conn, query, target)
 
 
 async def check_friends(conn, author, friend):

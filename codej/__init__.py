@@ -17,6 +17,7 @@ from .dirs import base, static, templates, settings
 from .errors import show_error
 from .aliases.views import show_aliases
 from .api.aliases import Aliases
+from .api.arts import Art
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -26,10 +27,12 @@ from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
+from .arts.views import show_art, show_arts
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
 from .main.views import (
-    jump, show_avatar, show_favicon, show_index, show_picture)
+    jump, show_avatar, show_favicon, show_index,
+    show_picture, show_public, show_sitemap)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 
@@ -102,10 +105,12 @@ app = StApp(
     routes=[
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
+        Route('/sitemap.xml', show_sitemap, name='sitemap'),
         Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Route('/picture/{suffix}', show_picture, name='picture'),
+        Route('/public/{slug}', show_public, name='public'),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
@@ -135,6 +140,11 @@ app = StApp(
             Route('/draft', Draft, name='adraft'),
             Route('/labels', Labels, name='alabel'),
             Route('/send-par', Paragraph, name='aparagraph'),
+            Route('/art', Art, name='aart'),
+            ]),
+        Mount('/arts', name='arts', routes=[
+            Route('/', show_arts, name='arts'),
+            Route('/{slug}', show_art, name='art')
             ]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),
