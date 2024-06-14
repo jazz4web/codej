@@ -4,7 +4,7 @@ import os
 
 from starlette.exceptions import HTTPException
 from starlette.responses import (
-    FileResponse, PlainTextResponse, RedirectResponse, Response)
+    FileResponse, RedirectResponse, Response)
 
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
@@ -114,8 +114,18 @@ async def jump(request):
                 request.session['jumps'] = jumps
             await conn.close()
             return RedirectResponse(alias.get('url'), 301)
+    elif len(suffix) in (8, 11, 12, 13):
+        art = await conn.fetchrow(
+            'SELECT suffix, slug FROM articles WHERE suffix = $1', suffix)
+        await conn.close()
+        if art:
+            curl = request.url_for('public', slug=art.get('slug'))
+            rurl = request.url_for('arts:art', slug=art.get('slug'))
+            response = RedirectResponse(rurl, 301)
+            response.headers.append('Link', f'<{curl}>; rel="canonical"')
+            return response
     await conn.close()
-    return PlainTextResponse(f'{suffix}')
+    raise HTTPException(status_code=404, detail='Такой страницы у нас нет.')
 
 
 async def show_avatar(request):
