@@ -15,6 +15,20 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def check_article(request, conn, slug, target):
+    query = await conn.fetchrow(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.html, a.summary,
+                a.meta, a.published, a.edited, a.state, a.commented,
+                a.viewed, a.author_id, u.username, u.ugroup, u.weight
+             FROM articles AS a, users AS u
+             WHERE a.slug = $1
+               AND u.id = a.author_id
+               AND a.state IN ($2, $3, $4)''',
+        slug, status.pub, status.priv, status.ffo)
+    if query:
+        await parse_art_query(request, conn, query, target)
+
+
 async def undress_art_links(conn, did):
     pars = await conn.fetch(
         '''SELECT mdtext FROM paragraphs

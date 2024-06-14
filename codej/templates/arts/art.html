@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/arts/art.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/entity-details.css',
+             'css/personal-details.css',
+             'css/common-details.css',
+             'css/form-labeled.css',
+             'css/entity-text-block.css',
+             'css/labels.css',
+             'css/public.css',
+             'css/next-block.css',
+             'css/pygments.css',
+             'css/art.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+  <link rel="canonical" href="{{ url_for('public', slug=slug) }}">
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="artt" type="text/template">
+    <div id="topic-head" class="content-block">
+      <h1 title="<% art.title %>">
+        <% art.title %>
+      </h1>
+      <div class="entity-attributes">
+        <div class="author-avatar avatar"
+             style="background:url(<% art.ava %>)"></div>
+        <div class="entity-info">
+          <h4>
+            <a class="author-profile-link"
+               href="/people/<% art.author %>">
+              <% art.author %>
+            </a>
+          </h4>
+          <div class="info-line-block personal-details">
+            <table>
+              <tbody>
+                <% #art.published %>
+                <tr>
+                  <td><span class="date-info">Опубликован:&nbsp;</span></td>
+                  <td><span
+                    class="date-info date-field"><% art.published %></td>
+                </tr>
+                <% /art.published %>
+                <tr>
+                  <td><span
+                    class="date-info">Отредактирован:&nbsp;</span></td>
+                  <td><span
+                    class="date-info date-field"><% art.edited %></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="date-info">Статус:&nbsp;</span></td>
+                  <td><span class="date-info"><% art.state %></span>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="footer-bottom"></div>
+      </div>
+    </div>
+    <div class="common-details">
+      <div class="entity-blog-link">
+        <a href="/arts/a/<% art.author %>"><% art.author %>&nbsp;блог</a>
+      </div>
+      <div class="entity-details">
+        <table align="center" class="entity-details-table">
+          <tbody>
+            <tr>
+              <td>
+                <div class="labeled labeled-text labeled-info viewed-ind"
+                     title="количество просмотров">
+                  <span class="glyphicon glyphicon-eye-open"
+                        aria-hidden="true"></span><span
+                        class="value"><% art.viewed %></span>
+                </div>
+              </td>
+              <td>
+                <div class="labeled labeled-text labeled-success like-block"
+                     title="количество нра">
+                  <span class="glyphicon glyphicon-thumbs-up"
+                        aria-hidden="tue"></span><span
+                        class="value"><% art.likes %></span>
+                </div>
+              </td>
+              <td>
+                <div class="labeled labeled-text labeled-danger dislike-block"
+                     title="количество ненра">
+                  <span class="glyphicon glyphicon-thumbs-down"
+                        aria-hidden="true"></span><span
+                        class="value"><% art.dislikes %></span>
+                </div>
+              </td>
+              <td>
+                <div class="labeled labeled-text
+                            <% #art.commented %>labeled-info
+                            <% /art.commented %>
+                            <% ^art.commented %>labeled-warning
+                            <% /art.commented %>"
+                     title="количество комментариев">
+                  <span class="glyphicon glyphicon-comment"
+                        aria-hidden="true"></span><span
+                        class="value"><% art.commentaries %></span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="entity-copy-link">
+        <button type="button"
+                class="btn btn-xs btn-default btn-block copy-link">
+          поделиться ссылкой
+        </button>
+        <div id="link-copy-form" class="to-be-hidden">
+          <div class="form-group">
+            <input id="copy-box"
+                   class="form-control"
+                   type="text"
+                   name="copy-box"
+                   value="<% art.jump %>">
+          </div>
+          <div class="form-group">
+            <button id="copy-button"
+                    type="button"
+                    data-clipboard-target="#copy-box"
+                    class="btn btn-xs btn-primary btn-block">
+              скопировать в буфер обмена
+            </button>
+          </div>
+        </div>
+        <% #own %>
+        <div class="editor-block">
+          <a href="/drafts/<% art.slug %>"
+             class="btn btn-xs btn-success btn-block">редактор</a>
+        </div>
+        <% /own %>
+      </div>
+    </div>
+    <% #anns %>
+    <div class="announce-block">
+      <div class="slidable">
+        <h3>Объявление: <% headline %></h3>
+      </div>
+      <div class="block-body announce-body">
+        <div class="entity-text-block"><%{ html }%></div>
+      </div>
+    </div>
+    <% /anns %>
+    <div class="text-block entity-text-block"><%{ art.html }%></div>
+    <div class="entity-labels-block">
+      <table>
+        <tbody>
+          <tr>
+            <td>Метки:&nbsp;</td>
+            <td class="labels">
+              <% #art.labels %>
+                <a href="/blogs/<% art.author %>/t/<% . %>"><% . %></a>, 
+              <% /art.labels %>
+              <% ^art.labels %>
+                автор забыл установить метки.
+              <% /art.labels %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="options-block">
+      <button id="move-screen-up"
+              type="button"
+              class="btn btn-default btn-sm"
+              title="прокрутить наверх">
+        <span class="glyphicon glyphicon-hand-up"
+              aria-hidden="true"></span>
+      </button>
+      <% #follow %>
+        <button id="tape-in"
+                type="button"
+                title="добавить в ленту"
+                class="btn btn-success btn-sm">
+          <span class="glyphicon glyphicon-hand-right"
+                aria-hidden="true"></span>
+        </button>
+      <% /follow %>
+      <% #like %>
+        <button id="like-button"
+                type="button"
+                title="нравится"
+                class="btn btn-success btn-sm">
+          <span class="glyphicon glyphicon-thumbs-up white-space"
+                aria-hidden="true"></span><span
+                class="value"><% art.likes %></span>
+        </button>
+      <% /like %>
+      <% #dislike %>
+        <button id="dislike-button"
+                type="button"
+                title="не нравится"
+                class="btn btn-warning btn-sm">
+          <span class="glyphicon glyphicon-thumbs-down white-space"
+                aria-hidden="true"></span><span
+                class="value"><% art.dislikes %></span>
+        </button>
+      <% /dislike %>
+      <% #follower %>
+        <button id="tape-out"
+                type="button"
+                title="удалить из ленты"
+                class="btn btn-warning btn-sm">
+          <span class="glyphicon glyphicon-hand-left"
+                aria-hidden="true"></span>
+        </button>
+      <% /follower %>
+      <% #cens %>
+        <button id="censor-this"
+                type="button"
+                title="блокировать"
+                class="btn btn-danger btn-sm">
+          <span class="glyphicon glyphicon-lock"
+                aria-hidden="true"></span>
+        </button>
+      <% /cens %>
+      <% #admin %>
+        <button id="special-case"
+                type="button"
+                title="раздеть ссылки"
+                class="btn btn-primary btn-sm">
+          <span class="glyphicon glyphicon-link"
+                aria-hidden="true"></span>
+        </button>
+      <% /admin %>
+    </div>
+    <div class="next-block comments-options">
+      <div class="comment-header">
+        <% #art.commented %>
+          Комментарии: (<% art.commentaries %>)
+        <% /art.commented %>
+        <% ^art.commented %>
+          Комментарии закрыты...
+        <% /art.commented %>
+      </div>
+      <div class="comments-options-block">
+        <% #art.commented %>
+        <button id="new-comment-add"
+                type="button"
+                title="высказаться"
+                class="btn btn-sm btn-primary">
+          <span class="glyphicon glyphicon-comment"
+                aria-hidden="true"></span>
+        </button>
+        <% /art.commented %>
+      </div>
+      <div class="footer-bottom"></div>
+    </div>
+    <div id="entity-commentaries" class="next-block to-be-hidden"></div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",slug="{{ slug }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/arts/art.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/check-mc.js',
+             'js/slide-page.js',
+             'js/show-art.js',
+             'js/check-browser.js',
+             'js/ping-user.js',
+             'js/count-clicks.js',
+             'js/format-datetime.js',
+             'js/show-copy-form.js',
+             'js/copy-this.js',
+             'js/adjust-frame.js',
+             'js/adjust-image.js',
+             'js/set-margin.js',
+             'js/click-image.js',
+             'js/move-screen-up.js',
+             'js/scroll-panel.js',
+             'js/arts/art.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

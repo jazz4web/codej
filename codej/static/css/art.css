@@ -1,0 +1,31 @@
+.editor-block {
+  margin: 4px 0 0;
+}
+
+#options-block {
+  margin: 4px 0 0;
+  text-align: center;
+}
+
+.white-space {
+  margin-right: 6px;
+}
+
+.comments-options {
+  margin: 4px 0 0;
+}
+
+.comment-header {
+  width: 45%;
+  float: left;
+  text-shadow: 0 0 3px lightgray;
+  font-style: italic;
+  padding: 8px 0 0;
+  margin: 0;
+}
+
+.comments-options-block {
+  margin-left: 46%;
+  text-align: right;
+  padding: 4px 6px 4px 0;
+}

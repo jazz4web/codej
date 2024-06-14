@@ -25,7 +25,8 @@ async def parse_art_query(request, conn, query, target):
     target['commented'] = query.get('commented')
     target['viewed'] = query.get('viewed')
     target['author'] = query.get('username')
-    target['author_perms'] = query.get('permissions')
+    target['group'] = query.get('ugroup')
+    target['weight'] = query.get('weight')
     target['author_id'] = query.get('author_id')
     target['ava'] = request.url_for(
         'ava', username=query.get('username'), size=98)._url
