@@ -10,7 +10,6 @@ function follow(event) {
     success: function(data) {
       if (data.message) {
         showError('#options-block', data);
-        $('#ealert').addClass('next-block');
       } else {
         window.location.reload();
       }

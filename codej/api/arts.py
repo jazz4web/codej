@@ -9,6 +9,104 @@ from ..drafts.attri import status
 from .pg import check_article, check_rel
 
 
+class Dislike(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        art = await conn.fetchrow(
+            '''SELECT a.id, a.author_id, u.weight, u.ugroup
+                 FROM articles AS a, users AS u
+                 WHERE a.author_id = u.id
+                   AND a.slug = $1 AND a.state IN ($2, $3, $4)''',
+            d.get('slug', ''), status.pub, status.priv, status.ffo)
+        if art is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        rel = await check_rel(conn, art.get('author_id'), cu.get('id'))
+        if cu.get('weight') < 50 or art.get('weight') == 255 or \
+                rel['blocked'] or rel['blocker']:
+            res['message'] = 'Запрос отклонён.'
+            await conn.close()
+            return JSONResponse(res)
+        l = await conn.fetchrow(
+            'SELECT * FROM likes WHERE article_id = $1 AND user_id = $2',
+            art.get('id'), cu.get('id'))
+        d = await conn.fetchrow(
+            'SELECT * FROM dislikes WHERE article_id = $1 AND user_id = $2',
+            art.get('id'), cu.get('id'))
+        if l:
+            await conn.execute(
+                'DELETE FROM likes WHERE article_id = $1 AND user_id = $2',
+                art.get('id'), cu.get('id'))
+        if not l and not d:
+            await conn.execute(
+                'INSERT INTO dislikes (article_id, user_id) VALUES ($1, $2)',
+                art.get('id'), cu.get('id'))
+        res = {'done': True,
+               'likes': await conn.fetchval(
+                   'SELECT count(*) FROM likes WHERE article_id = $1',
+                   art.get('id')),
+               'dislikes': await conn.fetchval(
+                   'SELECT count(*) FROM dislikes WHERE article_id = $1',
+                   art.get('id'))}
+        await conn.close()
+        return JSONResponse(res)
+
+
+class Like(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        art = await conn.fetchrow(
+            '''SELECT id, author_id FROM articles
+                 WHERE slug = $1 AND state IN ($2, $3, $4)''',
+            d.get('slug', ''), status.pub, status.priv, status.ffo)
+        if art is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('id') == art.get('author_id'):
+            res['message'] = 'Запрос отклонён.'
+            await conn.close()
+            return JSONResponse(res)
+        l = await conn.fetchrow(
+            'SELECT * FROM likes WHERE article_id = $1 AND user_id = $2',
+            art.get('id'), cu.get('id'))
+        d = await conn.fetchrow(
+            'SELECT * FROM dislikes WHERE article_id = $1 AND user_id = $2',
+            art.get('id'), cu.get('id'))
+        if d:
+            await conn.execute(
+                'DELETE FROM dislikes WHERE article_id = $1 AND user_id = $2',
+                art.get('id'), cu.get('id'))
+        if not d and not l:
+            await conn.execute(
+                'INSERT INTO likes (article_id, user_id) VALUES ($1, $2)',
+                art.get('id'), cu.get('id'))
+        res = {'done': True,
+               'likes': await conn.fetchval(
+                   'SELECT count(*) FROM likes WHERE article_id = $1',
+                   art.get('id')),
+               'dislikes': await conn.fetchval(
+                   'SELECT count(*) FROM dislikes WHERE article_id = $1',
+                   art.get('id'))}
+        await conn.close()
+        return JSONResponse(res)
+
+
 class Lenta(HTTPEndpoint):
     async def put(self, request):
         res = {'done': None}
