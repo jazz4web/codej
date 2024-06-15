@@ -3,9 +3,48 @@ from starlette.responses import JSONResponse
 
 from ..auth.attri import groups
 from ..auth.cu import checkcu
+from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import check_article, check_rel
+
+
+class Lenta(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        user = await conn.fetchval(
+            'SELECT author_id FROM articles WHERE slug = $1',
+            d.get('slug', ''))
+        if user is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        rel = await check_rel(conn, user, cu.get('id'))
+        if rel['follower']:
+            await conn.execute(
+                '''DELETE FROM followers WHERE author_id = $1
+                     AND follower_id = $2''', user, cu.get('id'))
+            res['done'] = True
+            await set_flashed(request, 'Автор топика удалён из вашей ленты.')
+        else:
+            if rel['blocked'] or rel['blocker']:
+                res['message'] = 'Запрос отклонён.'
+                await conn.close()
+                return JSONResponse(res)
+            await conn.execute(
+                '''INSERT INTO followers (author_id, follower_id)
+                     VALUES ($1, $2)''', user, cu.get('id'))
+            res['done'] = True
+            await set_flashed(request, 'Автор топика добавлен в вашу ленту.')
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Art(HTTPEndpoint):

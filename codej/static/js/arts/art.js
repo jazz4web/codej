@@ -14,4 +14,8 @@ $(function() {
   $('body').on('click', '.entity-text-block img', clickImage);
   $('body').on('click', '#move-screen-up', moveScreenUp);
   showArt('/api/art', slug, dt);
+  if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#tape-out', {slug: slug}, follow);
+    $('body').on('click', '#tape-in', {slug: slug}, follow);
+  }
 });

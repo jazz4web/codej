@@ -17,7 +17,7 @@ from .dirs import base, static, templates, settings
 from .errors import show_error
 from .aliases.views import show_aliases
 from .api.aliases import Aliases
-from .api.arts import Art
+from .api.arts import Art, Lenta
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -141,6 +141,7 @@ app = StApp(
             Route('/labels', Labels, name='alabel'),
             Route('/send-par', Paragraph, name='aparagraph'),
             Route('/art', Art, name='aart'),
+            Route('/follow', Lenta, name='afollow'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
