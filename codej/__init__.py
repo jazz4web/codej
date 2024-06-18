@@ -15,7 +15,7 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import base, static, templates, settings
 from .errors import show_error
-from .announces.views import show_announces
+from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.announces import Announces
 from .api.aliases import Aliases
@@ -115,7 +115,7 @@ app = StApp(
         Route('/public/{slug}', show_public, name='public'),
         Mount('/announces', name='announces', routes=[
             Route('/', show_announces, name='announces'),
-            ]),
+            Route('/{suffix}', show_announce, name='announce')]),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[

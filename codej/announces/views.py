@@ -4,6 +4,19 @@ from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 
 
+async def show_announce(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    await conn.close()
+    return request.app.jinja.TemplateResponse(
+        'announces/announce.html',
+        {'request': request,
+         'cu': cu,
+         'listed': False,
+         'suffix': request.path_params.get('suffix'),
+         'flashed': await get_flashed(request)})
+
+
 async def show_announces(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
