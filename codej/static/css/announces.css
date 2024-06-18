@@ -1,0 +1,35 @@
+.slidable {
+  cursor: pointer;
+}
+
+.form-form {
+  margin: 4px 0 0;
+}
+
+.form-group {
+  margin: 0 0 4px;
+}
+
+.submit-group {
+  margin: 0;
+}
+
+.checkbox {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.checkbox label label {
+  padding-left: 3px;
+}
+
+#body {
+  text-align: justify;
+  font-size: 12pt;
+}
+
+.title-link {
+  color: dimgray;
+}

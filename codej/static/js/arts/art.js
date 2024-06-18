@@ -15,6 +15,10 @@ $(function() {
   $('body').on('click', '#move-screen-up', moveScreenUp);
   showArt('/api/art', slug, dt);
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#special-case', {slug: slug}, function(event) {
+      $(this).blur();
+      undressLinks(event.data.slug);
+    });
     $('body').on('click', '#tape-out', {slug: slug}, follow);
     $('body').on('click', '#tape-in', {slug: slug}, follow);
     $('body').on('click', '#dislike-button', {slug: slug}, function(event) {

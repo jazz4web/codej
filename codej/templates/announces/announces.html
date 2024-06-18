@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Ваши объявления{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() }}
+  {%- assets filters='cssmin', output='generic/css/announces/announces.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/form-help.css',
+             'css/next-block.css',
+             'css/today-field.css',
+             'css/length-marker.css',
+             'css/errors.css',
+             'css/announces.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{ super() }}
+  <script id="announcest" type="text/template">
+    <% #extra %>
+      <div id="new-title" class="content-block entity-block">
+        <div class="slidable">
+          <h1>Создайте новое объявление</h1>
+        </div>
+        <div class="block-body to-be-hidden">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Уважаемый <% cu.username %>, здесь можно создать объявление,
+              которое будет транслироваться в топиках Вашего блога, или
+              во всех публичных топиках всех авторов, если вы администратор.
+              Заголовок объявления обязателен, его длина до
+              50 символов, текст объявления обязателен. Объявление будет
+              опубликовано, или будет скрыто, в зависимости от состояния
+              соответствующего флага.
+            </p>
+          </div>
+          <div class="form-form">
+            <div class="form-headline-group">
+              <label class="sr-only" for="headline">Заголовок:</label>
+              <input class="form-control"
+                     id="headline"
+                     name="headline"
+                     placeholder="Введите заголовок"
+                     required
+                     type="text">
+            </div>
+            <div class="form-group">
+              <div class="length-marker">
+                Осталось: <span id="length-marker">1024</span>
+              </div>
+              <label class="sr-only" for="body">Описание:</label>
+              <textarea class="form-control"
+                        id="body"
+                        name="body"
+                        placeholder="введите текст объявления"
+                        required
+                        rows="8"></textarea>
+            </div>
+            <div class="form-group checkbox">
+              <label>
+                <input id="heap" name="heap" type="checkbox">
+                <label for="heap">Показывать в блогах</label>
+              </label>
+            </div>
+            <div class="form-group submit-group">
+              <button class="btn btn-primary btn-block"
+                      id="submit"
+                      name="submit"
+                      type="button">
+                Создать
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% /extra %>
+    <% #pagination.announces %>
+      {#{%- if flashed -%}
+      {{ show_announce(fl=True) }}
+      {%- else -%}
+      {{ show_announce() }}
+      {%- endif -%}#}
+    <% /pagination.announces %>
+    <% ^pagination.announces %>
+      <div class="flashed-alert next-block">
+        На текущий момент у вас нет объявлений.
+      </div>
+    <% /pagination.announces %>
+    <% #pv %>
+      <!-- -->
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let page={{ page }},cu="{{ cu.username }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/announces/announces.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/check-mc.js',
+             'js/ping-user.js',
+             'js/slide-page.js',
+             'js/slide-block.js',
+             'js/render-tf.js',
+             'js/announces/announces.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

@@ -15,7 +15,9 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import base, static, templates, settings
 from .errors import show_error
+from .announces.views import show_announces
 from .aliases.views import show_aliases
+from .api.announces import Announces
 from .api.aliases import Aliases
 from .api.arts import Art, Dislike, Lenta, Like
 from .api.auth import (
@@ -111,6 +113,9 @@ app = StApp(
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Route('/picture/{suffix}', show_picture, name='picture'),
         Route('/public/{slug}', show_public, name='public'),
+        Mount('/announces', name='announces', routes=[
+            Route('/', show_announces, name='announces'),
+            ]),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
@@ -144,6 +149,7 @@ app = StApp(
             Route('/follow', Lenta, name='afollow'),
             Route('/like', Like, name='alike'),
             Route('/dislike', Dislike, name='adislike'),
+            Route('/announces', Announces, name='aannounces'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
