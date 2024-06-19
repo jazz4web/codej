@@ -10,6 +10,7 @@ $(function() {
   $('.entity-text-block iframe').each(adjustFrame);
   $('.entity-text-block').children().each(setMargin);
   $('.entity-text-block img').each(adjustImage);
+  showAnns(suffix);
   $('body').on('click', '.entity-text-block img', clickImage);
   pingUser();
 });

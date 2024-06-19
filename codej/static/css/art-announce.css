@@ -1,0 +1,18 @@
+.announce-block {
+  margin: 4px 0 0;
+  border: 1px solid lightsalmon;
+  border-radius: 3px;
+  box-shadow: 0 0 3px salmon;
+  padding: 6px 6px;
+  font-style: italic;
+  background-color: snow;
+}
+
+.announce-block h3 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.slidable {
+  cursor: pointer;
+}

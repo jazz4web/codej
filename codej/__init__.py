@@ -17,7 +17,7 @@ from .dirs import base, static, templates, settings
 from .errors import show_error
 from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
-from .api.announces import Announce, Announces
+from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import Art, Dislike, Lenta, Like
 from .api.auth import (
@@ -151,6 +151,7 @@ app = StApp(
             Route('/dislike', Dislike, name='adislike'),
             Route('/announces', Announces, name='aannounces'),
             Route('/announce', Announce, name='aannounce'),
+            Route('/broadcast', Broadcast, name='abroadcast'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),

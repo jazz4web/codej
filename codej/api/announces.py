@@ -12,7 +12,21 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..common.random import get_unique_s
 from .md import html_ann
-from .pg import check_ann, check_last, select_announces
+from .pg import check_ann, check_last, select_announces, select_broadcast
+
+
+class Broadcast(HTTPEndpoint):
+    async def get(self, request):
+        res = {'anns': None}
+        suffix = request.query_params.get('suffix')
+        if suffix:
+            conn = await get_conn(request.app.config)
+            art = await conn.fetchval(
+                'SELECT author_id FROM articles WHERE suffix = $1', suffix)
+            if art:
+                res['anns'] = await select_broadcast(conn, art)
+            await conn.close()
+        return JSONResponse(res)
 
 
 class Announce(HTTPEndpoint):

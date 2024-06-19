@@ -15,6 +15,32 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_broadcast(conn, aid):
+    res = list()
+    adm = await conn.fetchrow(
+        '''SELECT a.headline, a.html, a.published
+             FROM announces AS a
+             WHERE adm = true
+               AND pub = true
+               AND a.author_id != $1
+             ORDER BY random() LIMIT 1''', aid)
+    if adm:
+        res.append({'headline': adm.get('headline'),
+                    'html': adm.get('html'),
+                    'published': f'{adm.get("published").isoformat()}Z'})
+    auth = await conn.fetchrow(
+        '''SELECT a.headline, a.html, a.published
+             FROM announces AS a, users AS u
+             WHERE a.author_id = $1
+               AND u.id = a.author_id
+               AND pub = true ORDER BY random() LIMIT 1''', aid)
+    if auth:
+        res.append({'headline': auth.get('headline'),
+                    'html': auth.get('html'),
+                    'published': f'{auth.get("published").isoformat()}Z'})
+    return res
+
+
 async def check_ann(conn, suffix, uid, target):
     query = await conn.fetchrow(
         'SELECT * FROM announces WHERE suffix = $1 AND author_id = $2',

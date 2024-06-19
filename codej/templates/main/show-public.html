@@ -25,11 +25,27 @@
              'css/labels.css',
              'css/pygments.css',
              'css/main-container.css',
+             'css/art-announce.css',
              'css/public.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
   <link rel="canonical" href="{{ url_for('public', slug=topic['slug']) }}">
 {%- endblock styles -%}
+
+{%- block templates -%}
+  <script id="announcet" type="text/template">
+    <% #anns %>
+      <div class="announce-block">
+        <div class="slidable">
+          <h3>Объявление: <% headline %></h3>
+        </div>
+        <div class="block-body announce-body">
+          <div class="entity-text-block"><%{ html }%></div>
+        </div>
+      </div>
+    <% /anns %>
+  </script>
+{%- endblock templates -%}
 
 {%- block page_body -%}
   <div id="topic-head" class="content-block">
@@ -184,6 +200,7 @@
              'js/click-image.js',
              'js/ping-user.js',
              'js/count-clicks.js',
+             'js/show-anns.js',
              'js/main/show-public.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
