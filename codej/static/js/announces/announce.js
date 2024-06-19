@@ -45,6 +45,26 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    $('body').on('click', '#remove-button', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'DELETE',
+        url: '/api/announce',
+        data: {
+          suffix: suffix,
+          auth: window.localStorage.getItem('token')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.replace(data.redirect);
+          } else {
+            showError('.ann-block', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    })
     $('body').on('click', '#state-button', function() {
       $(this).blur();
       changeAnn('pub', 0, suffix);

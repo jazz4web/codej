@@ -16,6 +16,36 @@ from .pg import check_ann, check_last, select_announces
 
 
 class Announce(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            '''SELECT suffix FROM announces
+                 WHERE suffix = $1 AND author_id = $2''',
+            d.get('suffix', ''), cu.get('id'))
+        if target is None:
+            res['message'] = 'Ничего не найдено по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'DELETE FROM announces WHERE suffix = $1 AND author_id = $2',
+            d.get('suffix', ''), cu.get('id'))
+        await conn.close()
+        res['done'] = True
+        res['redirect'] = request.url_for('announces:announces')._url
+        await set_flashed(request, 'Объявление удалено.')
+        return JSONResponse(res)
+
     async def get(self, request):
         conn = await get_conn(request.app.config)
         res = {'cu': await checkcu(
