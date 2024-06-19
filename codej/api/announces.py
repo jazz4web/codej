@@ -40,6 +40,75 @@ class Announce(HTTPEndpoint):
         res['announce'] = target
         return JSONResponse(res)
 
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        field, value, suffix = (
+            d.get('field', ''), d.get('value', ''), d.get('suffix', ''))
+        if not all((field, value, suffix)):
+            res['message'] = 'Запрос содержит неверные параметры.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            '''SELECT suffix, pub FROM announces
+                 WHERE suffix = $1 AND author_id = $2''', suffix, cu.get('id'))
+        if target is None:
+            res['message'] = 'Ничего не найдено по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        if field == 'pub':
+            if target.get('pub'):
+                message = 'Объявление скрыто.'
+            else:
+                message = 'Объявление опубликовано.'
+            await conn.execute(
+                '''UPDATE announces SET published = $1, pub = $2
+                     WHERE suffix = $3''',
+                datetime.utcnow(), not target.get('pub'), suffix)
+            await conn.close()
+            res['done'] = True
+            await set_flashed(request, message)
+            return JSONResponse(res)
+        if field == 'headline':
+            if len(value) > 50:
+                res['message'] = 'Запрос содержит неверные параметры.'
+                await conn.close()
+                return JSONResponse(res)
+            await conn.execute(
+                'UPDATE announces SET headline = $1 WHERE suffix = $2',
+                value, suffix)
+            await conn.close()
+            res['done'] = True
+            await set_flashed(request, 'Заголовок объявления изменён.')
+            return JSONResponse(res)
+        if field == 'body':
+            if len(value) > 1024:
+                res['message'] = 'Запрос содержит неверные параметры.'
+                await conn.close()
+                return JSONResponse(res)
+            loop = asyncio.get_running_loop()
+            html = await loop.run_in_executor(
+                None, functools.partial(html_ann, value))
+            await conn.execute(
+                'UPDATE announces SET body = $1, html = $2 WHERE suffix = $3',
+                value, html, suffix)
+            await conn.close()
+            res['done'] = True
+            await set_flashed(request, 'Текст объявления изменён.')
+            return JSONResponse(res)
+        await conn.close()
+        res['message'] = 'Запрос содержит неверные параметры.'
+        return JSONResponse(res)
+
 
 class Announces(HTTPEndpoint):
     async def get(self, request):
