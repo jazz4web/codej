@@ -12,7 +12,7 @@ async def show_announce(request):
         'announces/announce.html',
         {'request': request,
          'cu': cu,
-         'listed': False,
+         'listed': True,
          'suffix': request.path_params.get('suffix'),
          'flashed': await get_flashed(request)})
 

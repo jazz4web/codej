@@ -1,0 +1,21 @@
+.ann-block h2 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+#options-block {
+  margin: 4px 0 0;
+}
+
+.form-group {
+  margin: 0;
+}
+
+.last-group {
+  margin: 4px 0 0;
+}
+
+#text-edit {
+  text-align: justify;
+  font-size: 12pt;
+}

@@ -12,7 +12,33 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..common.random import get_unique_s
 from .md import html_ann
-from .pg import check_last, select_announces
+from .pg import check_ann, check_last, select_announces
+
+
+class Announce(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'cu': await checkcu(
+            request, conn, request.headers.get('x-auth-token')),
+               'suffix': request.query_params.get('suffix', ''),
+               'announce': None}
+        cu = res['cu']
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        target = dict()
+        await check_ann(conn, res.get('suffix'), cu.get('id'), target)
+        await conn.close()
+        if not target:
+            res['message'] = 'Ничего не найдено по запросу.'
+            return JSONResponse(res)
+        res['announce'] = target
+        return JSONResponse(res)
 
 
 class Announces(HTTPEndpoint):

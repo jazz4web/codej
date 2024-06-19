@@ -1,0 +1,41 @@
+{% macro show_announce(link=True) %}
+  <div class="entity-block ann-block">
+    <div class="slidable">
+      <h2>
+        {% if link %}
+          <a class="title-link" href="/announces/<% suffix %>">
+            <% headline %>
+          </a>
+        {% else %}
+          <% headline %>
+        {% endif %}
+      </h2>
+    </div>
+    <div class="block-body">
+      <div class="info-line-block personal-details">
+        <table>
+        <tbody>
+          <tr>
+            <td class="date-info">Опубликовано:&nbsp;</td>
+            <td class="date-info date-field"><% published %></td>
+          </tr>
+          <tr>
+            <td class="date-info">Статус:&nbsp;</td>
+            <td class="date-info">
+              <% #pub %>
+                публичное
+              <% /pub %>
+              <% ^pub %>
+                скрытое
+              <% /pub %>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+      <div class="entity-text-block">
+        <%{ html }%>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

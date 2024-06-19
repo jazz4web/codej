@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from "macros/_announces.html" import show_announce %}
+{% from "macros/_common.html" import show_pv %}
 
 {%- block title_part -%}Ваши объявления{%- endblock title_part -%}
 
@@ -16,6 +18,12 @@
              'css/today-field.css',
              'css/length-marker.css',
              'css/errors.css',
+             'css/next-block.css',
+             'css/entity-text-block.css',
+             'css/personal-details.css',
+             'css/ann.css',
+             'css/pygments.css',
+             'css/pagination.css',
              'css/announces.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -83,11 +91,7 @@
       </div>
     <% /extra %>
     <% #pagination.announces %>
-      {#{%- if flashed -%}
-      {{ show_announce(fl=True) }}
-      {%- else -%}
-      {{ show_announce() }}
-      {%- endif -%}#}
+      {{- show_announce() -}}
     <% /pagination.announces %>
     <% ^pagination.announces %>
       <div class="flashed-alert next-block">
@@ -95,7 +99,7 @@
       </div>
     <% /pagination.announces %>
     <% #pv %>
-      <!-- -->
+      {{- show_pv() -}}
     <% /pv %>
   </script>
 {%- endblock templates -%}
@@ -115,7 +119,14 @@
              'js/track-marker.js',
              'js/mark-input-error.js',
              'js/show-error.js',
+             'js/check-next.js',
+             'js/adjust-frame.js',
+             'js/set-margin.js',
+             'js/adjust-image.js',
+             'js/format-datetime.js',
              'js/scroll-panel.js',
+             'js/click-image.js',
+             'js/render-pv.js',
              'js/announces/announces.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

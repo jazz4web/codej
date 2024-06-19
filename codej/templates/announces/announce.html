@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% from "macros/_announces.html" import show_announce %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/announces/announce.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/entity-text-block.css',
+             'css/personal-details.css',
+             'css/aoptions.css',
+             'css/next-block.css',
+             'css/pygments.css',
+             'css/ann.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{ super() }}
+  <script id="announcet" type="text/template">
+    <% #announce %>
+      {{ show_announce(link=False) }}
+      <div class="editor-forms-block entity-block to-be-hidden next-block">
+        <div id="text-editor" class="form-form to-be-hidden">
+          <div class="length-marker">
+            Осталось: <span
+              id="length-marker">1024</span>
+          </div>
+          <div class="form-group">
+            <textarea id="text-edit"
+                      placeholder="введите текст объявления"
+                      class="form-control"
+                      rows="5"><% announce.body %></textarea>
+          </div>
+          <div class="form-group last-group">
+            <button id="text-submit"
+                    type="button"
+                    class="btn btn-primary btn-block"
+                    title="coхранить">
+              Сохранить
+            </button>
+          </div>
+        </div>
+        <div id="headline-editor" class="entity-block to-be-hidden">
+          <table class="inline-form-table">
+            <tbody>
+              <tr>
+                <td class="input-field">
+                  <input id="headline"
+                         class="form-control"
+                         type="text"
+                         value="<% announce.headline %>"
+                         placeholder="введите заголовок объявления">
+                </td>
+                <td>&nbsp;</td>
+                <td>
+                  <button id="headline-submit"
+                          class="btn btn-primary"
+                          type="button">
+                    Сохранить
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="remove-button-form" class="entity-block to-be-hidden">
+          <div class="form-group">
+            <button id="remove-button"
+                    type="button"
+                    class="btn btn-danger btn-block"
+                    title="удалить безвозвратно">
+              <span class="glyphicon glyphicon-trash"
+                    aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="options-block" class="albums-options text-center">
+        <button id="go-home"
+                type="button"
+                title="к списку объявлений"
+                class="btn btn-info btn-sm">
+          <span class="glyphicon glyphicon-home"
+                aria-hidden="true"></span>
+        </button>
+        <button id="edit-text-button"
+                type="button"
+                title="редактировать текст сообщения"
+                class="btn btn-success btn-sm">
+          <span class="glyphicon glyphicon-pencil"
+                aria-hidden="true"></span>
+        </button>
+        <button id="edit-headline"
+                type="button"
+                title="редактировать заголовок"
+                class="btn btn-primary btn-sm">
+          <span class="glyphicon glyphicon-edit"
+                aria-hidden="true"></span>
+        </button>
+        <button id="trash-button"
+                type="button"
+                title="удалить"
+                class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-trash"
+                aria-hidden="true"></span>
+        </button>
+        <button id="state-button"
+                <% #announce.pub %>
+                class="btn btn-success btn-sm"
+                title="снять"
+                <% /announce.pub %>
+                <% ^announce.pub %>
+                class="btn btn-warning btn-sm"
+                title="опубликовать"
+                <% /announce.pub %>
+                type="button">
+          <span class="glyphicon glyphicon-share-alt"
+                aria-hidden="true"></span>
+        </button>
+      </div>
+    <% /announce %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",suffix="{{ suffix }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/announces/announce.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/ping-user.js',
+             'js/check-browser.js',
+             'js/format-datetime.js',
+             'js/check-mc.js',
+             'js/adjust-frame.js',
+             'js/adjust-image.js',
+             'js/set-margin.js',
+             'js/announces/announce.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

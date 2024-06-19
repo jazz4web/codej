@@ -15,6 +15,19 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def check_ann(conn, suffix, uid, target):
+    query = await conn.fetchrow(
+        'SELECT * FROM announces WHERE suffix = $1 AND author_id = $2',
+        suffix, uid)
+    if query:
+        target['headline'] = query.get('headline')
+        target['body'] = query.get('body')
+        target['html'] = query.get('html')
+        target['suffix'] = query.get('suffix')
+        target['pub'] = query.get('pub')
+        target['published'] = f'{query.get("published").isoformat()}Z'
+
+
 async def select_announces(conn, uid, target, page, per_page, last):
     query = await conn.fetch(
         '''SELECT headline, html, suffix, pub, published, author_id
