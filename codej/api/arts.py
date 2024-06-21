@@ -3,10 +3,12 @@ from starlette.responses import JSONResponse
 
 from ..auth.attri import groups
 from ..auth.cu import checkcu
+from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
-from .pg import check_article, check_rel, select_broadcast
+from .pg import (
+    check_article, check_last, check_rel, select_arts, select_broadcast)
 
 
 class Dislike(HTTPEndpoint):
@@ -207,4 +209,30 @@ class Art(HTTPEndpoint):
             await conn.close()
             res['done'] = True
             res['views'] = art.get('viewed') + 1
+        return JSONResponse(res)
+
+
+class Arts(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'cu': await checkcu(
+            request, conn, request.headers.get('x-auth-token'))}
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            'SELECT count(*) FROM articles WHERE state IN ($1, $2)',
+            status.pub, status.priv)
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_arts(
+            request, conn, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
         return JSONResponse(res)

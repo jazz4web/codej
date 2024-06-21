@@ -19,7 +19,7 @@ from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
-from .api.arts import Art, Dislike, Lenta, Like
+from .api.arts import Art, Arts, Dislike, Lenta, Like
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -146,6 +146,7 @@ app = StApp(
             Route('/labels', Labels, name='alabel'),
             Route('/send-par', Paragraph, name='aparagraph'),
             Route('/art', Art, name='aart'),
+            Route('/arts', Arts, name='aarts'),
             Route('/follow', Lenta, name='afollow'),
             Route('/like', Like, name='alike'),
             Route('/dislike', Dislike, name='adislike'),
