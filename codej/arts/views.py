@@ -4,6 +4,20 @@ from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 
 
+async def show_labeled_arts(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    await conn.close()
+    return request.app.jinja.TemplateResponse(
+        'arts/labeled-arts.html',
+        {'request': request,
+         'cu': cu,
+         'page': await parse_page(request),
+         'label': request.path_params.get('label'),
+         'listed': True,
+         'flashed': await get_flashed(request)})
+
+
 async def show_arts(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)

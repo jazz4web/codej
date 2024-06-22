@@ -19,7 +19,7 @@ from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
-from .api.arts import Art, Arts, Dislike, Lenta, Like
+from .api.arts import Alabels, Art, Arts, Dislike, Lenta, Like
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -29,7 +29,7 @@ from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
-from .arts.views import show_art, show_arts
+from .arts.views import show_art, show_arts, show_labeled_arts
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
 from .main.views import (
@@ -147,6 +147,7 @@ app = StApp(
             Route('/send-par', Paragraph, name='aparagraph'),
             Route('/art', Art, name='aart'),
             Route('/arts', Arts, name='aarts'),
+            Route('/alabels', Alabels, name='alabels'),
             Route('/follow', Lenta, name='afollow'),
             Route('/like', Like, name='alike'),
             Route('/dislike', Dislike, name='adislike'),
@@ -156,7 +157,8 @@ app = StApp(
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
-            Route('/{slug}', show_art, name='art')
+            Route('/{slug}', show_art, name='art'),
+            Route('/t/{label}', show_labeled_arts, name='labeled-arts'),
             ]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),
