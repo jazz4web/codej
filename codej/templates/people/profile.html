@@ -18,6 +18,8 @@
              'css/personal-details.css',
              'css/form-help.css',
              'css/next-block.css',
+             'css/length-marker.css',
+             'css/errors.css',
              'css/form-labeled.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -61,6 +63,69 @@
         <div class="footer-bottom"></div>
       </div>
     </div>
+    <% #description %>
+      <div id="description-block" class="entity-block next-block">
+        <% #user.description %>
+          <div class="description-text">
+            <p class="blog-description"><% user.description %></p>
+          </div>
+        <% /user.description %>
+        <% #owner %>
+          <% ^user.description %>
+            <div class="description-text">
+              <div class="flashed-alert alert-block">
+                Добавьте описание своего блога.
+              </div>
+            </div>
+          <% /user.description %>
+          <div class="description-options text-center">
+            <button type="button"
+                    title="добавьте или измените описание блога"
+                    class="btn btn-default"
+                    id="fix-description">
+              Изменить описание блога.
+            </button>
+          </div>
+        <% /owner %>
+      </div>
+      <% #owner %>
+        <div id="description-e" class="entity-block next-block to-be-hidden">
+          <div class="length-marker">
+            Осталось: <span
+            id="length-marker">500</span>
+          </div>
+          <div class="form-form">
+            <div class="form-group">
+              <textarea id="description-editor"
+                        placeholder="введите текст описания"
+                        class="form-control"
+                        rows="6"><% user.description %></textarea>
+            </div>
+          </div>
+          <div class="form-group submit-group">
+            <button id="description-submit"
+                    class="btn btn-info"
+                    type="button">
+              Сохранить
+            </button>
+            <button type="button"
+                    id="cancel-description"
+                    class="btn btn-default">
+              Отменить
+            </button>
+          </div>
+        </div>
+      <% /owner %>
+    <% /description %>
+    <% #user.description %>
+      <% #user.last_published %>
+        <div class="entity-block next-block blog-link-block text-center">
+          <a href="/arts/a/<% user.username %>">
+            <% user.username %>&nbsp;блог
+          </a>
+        </div>
+      <% /user.last_published %>
+    <% /user.description %>
     <% #chgroup %>
       <div id="permissions" class="entity-block next-block">
         <div class="actions-header">
@@ -357,6 +422,7 @@
              'js/render-tf.js',
              'js/scroll-panel.js',
              'js/show-error.js',
+             'js/track-marker.js',
              'js/people/profile.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

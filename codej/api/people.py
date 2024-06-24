@@ -158,3 +158,30 @@ class Profile(HTTPEndpoint):
             request, f'Для {user.get("username")} установлена новая группа.')
         await conn.close()
         return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 100:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        text = d.get('text')
+        if text:
+            await conn.execute(
+                'UPDATE users SET description = $1 WHERE id = $2',
+                text.strip()[:500], cu.get('id'))
+        else:
+            await conn.execute(
+                'UPDATE users SET description = $1 WHERE id = $2',
+                None, cu.get('id'))
+        await conn.close()
+        res['done'] = True
+        await set_flashed(request, 'Описание блога обновлено.')
+        return JSONResponse(res)

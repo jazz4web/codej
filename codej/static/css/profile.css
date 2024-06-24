@@ -31,6 +31,32 @@
   margin: 6px 0 0;
 }
 
+.description-text {
+  margin: 0 0 4px;
+}
+
+.description-options {
+  padding: 4px 0 0;
+  border-top: 1px dashed lightgray;
+}
+
+.blog-description {
+  text-align: justify;
+  font-style: italic;
+  text-shadow: 0 0 6px lightgray;
+  margin: 0;
+}
+
+.blog-link-block {
+  font-style: italic;
+  text-shadow: 0 0 3px lightgray;
+}
+
+#description-editor {
+  font-size: 12pt;
+  text-align: justify;
+}
+
 .actions-header h2 {
   margin: 0;
   font-size: 1.2em;

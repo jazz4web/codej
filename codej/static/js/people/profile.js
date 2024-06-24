@@ -38,6 +38,11 @@ $(function() {
         renderLastSeen($('#profile .last-seen'));
         if ($('.today-field').length) renderTF('.today-field', dt);
         checkMC(860);
+        if (!data.user.description) {
+          $('#length-marker').text(500);
+        } else {
+          $('#length-marker').text(500 - data.user.description.length);
+        }
         if ($('#select-group').length) {
           let s = $('#select-group option');
           for (let n = 0; n < s.length; n++) {
@@ -94,6 +99,8 @@ $(function() {
         dataType: 'json'
       });
     });
+  }
+  if (cu === username) {
     $('body').on('click', '#chaddress-submit', function() {
       $(this).blur();
       let tee = {
@@ -217,6 +224,46 @@ $(function() {
       } else {
         ava.slideUp('slow', function() {
           checkMC(860);
+        });
+      }
+    });
+    $('body').on('click', '#fix-description', function() {
+      $(this).blur();
+      $(this).parents('.description-block').slideUp('slow');
+      let editor = $('#description-e');
+      editor.slideDown('slow', function() { scrollPanel(editor); });
+      $('#description-editor').focus();
+    });
+    $('body').on('click', '#cancel-description', function() {
+      $(this).blur();
+      $(this).parents('#description-e').slideUp('slow');
+      let description = $('.description-block');
+      description.slideDown('slow', function() { scrollPanel(description); });
+    });
+    $('body').on(
+      'keyup', '#description-editor',
+      {len: 500, marker: '#length-marker', block: '.length-marker'},
+      trackMarker);
+    $('body').on('click', '#description-submit', function() {
+      $(this).blur();
+      if (!$('#description-editor').parents('.form-group')
+                                   .hasClass('has-error')) {
+        $.ajax({
+          method: 'PUT',
+          url: '/api/profile',
+          data: {
+            auth: window.localStorage.getItem('token'),
+            text: $('#description-editor').val()
+          },
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('#profile', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
         });
       }
     });
