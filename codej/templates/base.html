@@ -67,6 +67,14 @@
                   <li>
                     <a href="{{ url_for('people:people') }}">Люди</a>
                   </li>
+                  {%- if cu['last_published'] -%}
+                    <li>
+                      <a href="{{ url_for(
+                          'blogs:blog', username=cu['username']) }}">
+                        Своё
+                      </a>
+                    </li>
+                  {%- endif -%}
                 {%- endif -%}
               </ul>
             </li>

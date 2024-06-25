@@ -1,7 +1,15 @@
+from starlette.responses import RedirectResponse
+
 from ..auth.cu import getcu
 from ..common.aparsers import parse_page
 from ..common.flashed import get_flashed
 from ..common.pg import get_conn
+
+
+async def show_author(request):
+    username = request.path_params.get('username')
+    url = request.url_for('blogs:blog', username=username)
+    return RedirectResponse(url, 301)
 
 
 async def show_labeled_arts(request):

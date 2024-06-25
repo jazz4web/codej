@@ -4,7 +4,45 @@ from starlette.responses import JSONResponse
 from ..auth.cu import checkcu
 from ..common.aparsers import parse_page
 from ..common.pg import get_conn
-from .pg import check_last, select_authors
+from ..drafts.attri import status
+from .pg import check_last, select_authors, select_authored
+
+
+class Blog(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'cu': await checkcu(
+            request, conn, request.headers.get('x-auth-token'))}
+        page = await parse_page(request)
+        username = request.query_params.get('username')
+        author = await conn.fetchrow(
+            'SELECT id, description FROM users WHERE username = $1', username)
+        if author is None:
+            res['message'] = f'Автор {username} не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM articles
+                 WHERE author_id = $1 AND state IN ($2, $3, $4)''',
+            author.get('id'), status.pub, status.priv, status.ffo)
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_authored(
+            request, conn, res['pagination'], author.get('id'), page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if author and author['description'] and res['pagination'] and \
+                res['pagination']['page'] == 1:
+            res['author'] = author.get('description')
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Authors(HTTPEndpoint):

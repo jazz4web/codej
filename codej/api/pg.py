@@ -15,6 +15,20 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_authored(request, conn, target, uid, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.summary, a.published,
+                  a.edited, a.state, a.commented, a.viewed, users.username
+             FROM articles AS a, users
+             WHERE a.author_id = users.id
+               AND a.author_id = $1
+               AND a.state IN ($2, $3, $4)
+             ORDER BY a.published DESC LIMIT $5 OFFSET $6''',
+        uid, status.pub, status.priv, status.ffo, per_page, per_page*(page-1))
+    if query:
+        await parse_arts_query(request, conn, query, target, page, last)
+
+
 async def select_authors(request, conn, target, page, per_page, last):
     query = await conn.fetch(
         '''SELECT id, username, registered, description, last_published
