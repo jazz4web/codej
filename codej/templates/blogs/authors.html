@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{%- from "macros/_common.html" import show_pv %}
+
+{%- block title_part -%}Авторы{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/blogs/authors.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/entity-block.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/next-block.css',
+             'css/pagination.css',
+             'css/authors.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="authorst" type="text/template">
+    <% #pagination.blogs %>
+      <div class="entity-block {% if flashed %}next-block{%- endif -%}">
+        <div class="entity-attributes">
+          <div class="author-avatar avatar"
+               style="background:url(<% ava %>)"></div>
+          <div class="entity-info">
+            <h4>
+              <a class="author-profile-link"
+                 href="/blogs/<% username %>"><% username %></a>
+            </h4>
+            <div class="info-block personal-details">
+              <table>
+              <tbody>
+                <tr>
+                  <td><span
+                    class="date-info">Зарегистрирован:&nbsp;</span></td>
+                  <td><span
+                    class="date-field"><% registered %></span></td>
+                </tr>
+                <tr>
+                  <td><span class="date-info">Обновлён:&nbsp;</span></td>
+                  <td><span
+                    class="date-field"><% last_published %></span></td>
+                </tr>
+              </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="footer-bottom"></div>
+          <div class="blog-description"><% description %></div>
+        </div>
+      </div>
+    <% /pagination.blogs %>
+    <% ^pagination.blogs %>
+      <div class="flashed-alert">
+        <div class="today-field"></div>
+        <div class="empty-message">
+          Сайт в стадии разработки, попробуйте зайти позже.
+        </div>
+      </div>
+    <% /pagination.blogs %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",page={{ page }};</script>
+  {%- assets filters='rjsmin', output='generic/js/blogs/authors.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/check-mc.js',
+             'js/render-tf.js',
+             'js/check-next.js',
+             'js/format-datetime.js',
+             'js/check-browser.js',
+             'js/render-pv.js',
+             'js/ping-user.js',
+             'js/blogs/authors.js' -%}
+             <script src="{{ ASSET_URL }}"></script>
+             {%- endassets -%}
+{%- endblock scripts -%}

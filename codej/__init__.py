@@ -24,12 +24,14 @@ from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
+from .api.blogs import Authors
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .arts.views import show_art, show_arts, show_labeled_arts
+from .blogs.views import show_blogs
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
 from .main.views import (
@@ -154,11 +156,15 @@ app = StApp(
             Route('/announces', Announces, name='aannounces'),
             Route('/announce', Announce, name='aannounce'),
             Route('/broadcast', Broadcast, name='abroadcast'),
+            Route('/blogs', Authors, name='ablogs'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
             Route('/{slug}', show_art, name='art'),
             Route('/t/{label}', show_labeled_arts, name='labeled-arts'),
+            ]),
+        Mount('/blogs', name='blogs', routes=[
+            Route('/', show_blogs, name='blogs'),
             ]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),
