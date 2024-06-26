@@ -6,6 +6,19 @@ from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 
 
+async def show_followed(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    await conn.close()
+    return request.app.jinja.TemplateResponse(
+        'arts/lenta.html',
+        {'request': request,
+         'page': await parse_page(request),
+         'cu': cu,
+         'listed': True,
+         'flashed': await get_flashed(request)})
+
+
 async def show_l_author(request):
     username = request.path_params.get('username')
     label = request.path_params.get('label')

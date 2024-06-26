@@ -15,6 +15,21 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_followed(request, conn, target, uid, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.summary, a.published,
+                  a.edited, a.state, a.commented, a.viewed, u.username
+             FROM articles AS a, users AS u, followers AS f
+             WHERE a.author_id = u.id
+               AND a.author_id = f.author_id
+               AND a.state IN ($1, $2, $3)
+               AND f.follower_id = $4
+             ORDER BY a.published DESC LIMIT $5 OFFSET $6''',
+        status.pub, status.priv, status.ffo, uid, per_page, per_page*(page-1))
+    if query:
+        await parse_arts_query(request, conn, query, target, page, last)
+
+
 async def select_l_blog(
         request, conn, target, uid, label, page, per_page, last):
     query = await conn.fetch(

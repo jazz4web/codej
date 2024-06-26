@@ -31,7 +31,8 @@ from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .arts.views import (
-    show_art, show_arts, show_author, show_labeled_arts, show_l_author)
+    show_art, show_arts, show_author, show_followed,
+    show_labeled_arts, show_l_author)
 from .blogs.views import show_blog, show_blogs, show_l_blog
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
@@ -160,12 +161,14 @@ app = StApp(
             Route('/blogs', Authors, name='ablogs'),
             Route('/blog', Blog, name='ablog'),
             Route('/lblog', LBlog, name='alblog'),
+            Route('/lenta', Lenta, name='alenta'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
             Route('/{slug}', show_art, name='art'),
             Route('/a/{username}', show_author, name='show-auth'),
             Route('/a/{username}/t/{label}', show_l_author, name='lauthor'),
+            Route('/l/', show_followed, name='lenta'),
             Route('/t/{label}', show_labeled_arts, name='labeled-arts'),
             ]),
         Mount('/blogs', name='blogs', routes=[

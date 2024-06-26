@@ -9,7 +9,7 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     check_article, check_last, check_rel, select_arts,
-    select_broadcast, select_labeled_arts)
+    select_broadcast, select_followed, select_labeled_arts)
 
 
 class Alabels(HTTPEndpoint):
@@ -143,6 +143,37 @@ class Like(HTTPEndpoint):
 
 
 class Lenta(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'cu': await checkcu(
+            request, conn, request.headers.get('x-auth-token'))}
+        cu = res['cu']
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM articles AS a, followers AS f
+                 WHERE a.author_id = f.author_id
+                   AND state IN ($1, $2, $3) AND f.follower_id = $4''',
+            status.pub, status.priv, status.ffo, cu.get('id'))
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_followed(
+            request, conn, res['pagination'], cu.get('id'), page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
+
     async def put(self, request):
         res = {'done': None}
         d = await request.form()
@@ -192,7 +223,7 @@ class Art(HTTPEndpoint):
         if not art:
             res['message'] = 'Ничего не найдено по запросу, проверьте ссылку.'
             await conn.close()
-            return JSONRespose(res)
+            return JSONResponse(res)
         if art.get('state') in (status.priv, status.ffo) and cu is None:
             res['message'] = 'Доступ ограничен, требуется авторизация.'
             await conn.close()

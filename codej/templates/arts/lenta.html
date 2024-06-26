@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{%- from "macros/_drafts.html" import show_arts -%}
+{%- from "macros/_common.html" import show_pv -%}
+
+{%- block title_part -%}Ваша лента{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/arts/lenta.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/entity-block.css',
+             'css/entity-attributes.css',
+             'css/labels.css',
+             'css/avatar.css',
+             'css/entity-summary.css',
+             'css/entity-details.css',
+             'css/personal-details.css',
+             'css/next-block.css',
+             'css/pagination.css',
+             'css/drafts.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() }}
+  <script id="draftst" type="text/template">
+    {{ show_arts('/arts/', '/arts/l/t/') }}
+    <% ^pagination.articles %>
+      <div class="flashed-alert">
+        <div class="today-field"></div>
+        <div class="empty-message">
+          В вашей ленте нет ни одного автора.
+        </div>
+      </div>
+    <% /pagination.articles %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let page={{ page }},cu="{{ cu.username }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/arts/lenta.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/ping-user.js',
+             'js/show-drafts.js',
+             'js/check-browser.js',
+             'js/render-tf.js',
+             'js/check-next.js',
+             'js/fix-comma.js',
+             'js/check-mc.js',
+             'js/slide-page.js',
+             'js/format-datetime.js',
+             'js/render-pv.js',
+             'js/arts/lenta.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
