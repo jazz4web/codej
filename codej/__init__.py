@@ -24,14 +24,15 @@ from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
-from .api.blogs import Authors, Blog
+from .api.blogs import Authors, Blog, LBlog
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
-from .arts.views import show_art, show_arts, show_author, show_labeled_arts
-from .blogs.views import show_blog, show_blogs
+from .arts.views import (
+    show_art, show_arts, show_author, show_labeled_arts, show_l_author)
+from .blogs.views import show_blog, show_blogs, show_l_blog
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
 from .main.views import (
@@ -158,17 +159,19 @@ app = StApp(
             Route('/broadcast', Broadcast, name='abroadcast'),
             Route('/blogs', Authors, name='ablogs'),
             Route('/blog', Blog, name='ablog'),
+            Route('/lblog', LBlog, name='alblog'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
             Route('/{slug}', show_art, name='art'),
             Route('/a/{username}', show_author, name='show-auth'),
+            Route('/a/{username}/t/{label}', show_l_author, name='lauthor'),
             Route('/t/{label}', show_labeled_arts, name='labeled-arts'),
             ]),
         Mount('/blogs', name='blogs', routes=[
             Route('/', show_blogs, name='blogs'),
             Route('/{username}', show_blog, name='blog'),
-            ]),
+            Route('/{username}/t/{label}', show_l_blog, name='blog-l')]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),
             Route('/{slug}', show_draft, name='draft'),

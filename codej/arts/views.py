@@ -6,6 +6,13 @@ from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 
 
+async def show_l_author(request):
+    username = request.path_params.get('username')
+    label = request.path_params.get('label')
+    url = request.url_for('blogs:blog-l', username=username, label=label)
+    return RedirectResponse(url, 301)
+
+
 async def show_author(request):
     username = request.path_params.get('username')
     url = request.url_for('blogs:blog', username=username)
