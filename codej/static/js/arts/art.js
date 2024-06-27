@@ -15,6 +15,7 @@ $(function() {
   $('body').on('click', '#move-screen-up', moveScreenUp);
   showArt('/api/art', slug, dt);
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#censor-this', {slug: slug}, censorThis);
     $('body').on('click', '#special-case', {slug: slug}, function(event) {
       $(this).blur();
       undressLinks(event.data.slug);

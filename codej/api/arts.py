@@ -9,7 +9,83 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     check_article, check_last, check_rel, select_arts,
-    select_broadcast, select_followed, select_labeled_arts, select_l_followed)
+    select_broadcast, select_carts, select_followed, select_labeled_arts,
+    select_l_followed)
+
+
+class CArt(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 250:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        slug = d.get('slug', '')
+        if not slug:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        art = await conn.fetchrow(
+            'SELECT slug, state FROM articles WHERE slug = $1', slug)
+        if art is None:
+            res['message'] = 'Запрос содержит неверные данные.'
+            await conn.close()
+            return JSONResponse(res)
+        if art.get('state') in (status.pub, status.priv, status.ffo):
+            await conn.execute(
+                'UPDATE articles SET state = $1 WHERE slug = $2',
+                status.cens, slug)
+            res['done'] = True
+            res['redirect'] = request.url_for('arts:cart', slug=slug)._url
+        if art.get('state') == status.cens:
+            await conn.execute(
+                'UPDATE articles SET state = $1 WHERE slug = $2',
+                status.draft, slug)
+            res['done'] = True
+            res['redirect'] = request.url_for('arts:carts')._url
+        await conn.close()
+        return JSONResponse(res)
+
+
+class CArts(HTTPEndpoint):
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        res = {'cu': await checkcu(
+            request, conn, request.headers.get('x-auth-token'))}
+        cu = res['cu']
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 250:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            'SELECT count(*) FROM articles WHERE state = $1', status.cens)
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_carts(
+            request, conn, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class LLenta(HTTPEndpoint):
