@@ -19,7 +19,7 @@ from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
-from .api.arts import Alabels, Art, Arts, Dislike, Lenta, Like
+from .api.arts import Alabels, Art, Arts, Dislike, Lenta, Like, LLenta
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -32,7 +32,7 @@ from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .arts.views import (
     show_art, show_arts, show_author, show_followed,
-    show_labeled_arts, show_l_author)
+    show_labeled_arts, show_l_author, show_l_followed)
 from .blogs.views import show_blog, show_blogs, show_l_blog
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
@@ -162,6 +162,7 @@ app = StApp(
             Route('/blog', Blog, name='ablog'),
             Route('/lblog', LBlog, name='alblog'),
             Route('/lenta', Lenta, name='alenta'),
+            Route('/llenta', LLenta, name='allenta'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
@@ -169,6 +170,7 @@ app = StApp(
             Route('/a/{username}', show_author, name='show-auth'),
             Route('/a/{username}/t/{label}', show_l_author, name='lauthor'),
             Route('/l/', show_followed, name='lenta'),
+            Route('/l/t/{label}', show_l_followed, name='llenta'),
             Route('/t/{label}', show_labeled_arts, name='labeled-arts'),
             ]),
         Mount('/blogs', name='blogs', routes=[
