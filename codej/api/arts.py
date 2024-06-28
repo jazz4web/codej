@@ -10,7 +10,48 @@ from ..drafts.attri import status
 from .pg import (
     check_article, check_cart, check_last, check_rel,
     select_arts, select_broadcast, select_carts, select_followed,
-    select_labeled_arts, select_l_followed)
+    select_labeled_arts, select_l_carts, select_l_followed)
+
+
+class LCArts(HTTPEndpoint):
+    async def get(self, request):
+        label = request.query_params.get('label')
+        conn = await get_conn(request.app.config)
+        res = {'label': label,
+               'cu': await checkcu(
+                   request, conn, request.headers.get('x-auth-token'))}
+        cu = res['cu']
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 250:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM articles, labels, als
+                 WHERE articles.id = als.article_id
+                   AND labels.label = $1
+                   AND labels.id = als.label_id
+                   AND articles.state = $2''',
+            label, status.cens)
+        if page > last:
+            res['message'] = f'Всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_l_carts(
+            request, conn, label, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class CArt(HTTPEndpoint):

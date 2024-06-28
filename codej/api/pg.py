@@ -15,6 +15,23 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_l_carts(
+        request, conn, label, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.summary, a.published,
+                  a.edited, a.state, a.commented, a.viewed, users.username
+             FROM articles AS a, users, labels, als
+               WHERE a.id = als.article_id
+                 AND a.author_id = users.id
+                 AND labels.id = als.label_id
+                 AND labels.label = $1
+                 AND a.state = $2
+             ORDER BY a.published DESC LIMIT $3 OFFSET $4''',
+        label, status.cens, per_page, per_page*(page-1))
+    if query:
+        await parse_arts_query(request, conn, query, target, page, last)
+
+
 async def check_cart(request, conn, slug, target):
     query = await conn.fetchrow(
         '''SELECT a.id, a.title, a.slug, a.suffix, a.html, a.summary,

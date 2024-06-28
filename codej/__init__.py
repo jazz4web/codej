@@ -20,7 +20,7 @@ from .aliases.views import show_aliases
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import (
-    Alabels, Art, Arts, CArt, CArts, Dislike, Lenta, Like, LLenta)
+    Alabels, Art, Arts, CArt, CArts, Dislike, LCArts, Lenta, Like, LLenta)
 from .api.auth import (
     ChangeAva, ChangeEmail, ChangePasswd, GetPasswd,
     Login, Logout, LogoutAll, ResetPasswd,
@@ -33,8 +33,8 @@ from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
 from .api.tasks import check_swapped, rem_expired_sessions
 from .arts.views import (
     show_art, show_arts, show_author, show_cart,
-    show_carts, show_followed, show_labeled_arts, show_l_author,
-    show_l_followed)
+    show_carts, show_followed, show_labeled_arts, show_l_carts,
+    show_l_author, show_l_followed)
 from .blogs.views import show_blog, show_blogs, show_l_blog
 from .captcha.views import show_captcha
 from .drafts.views import show_draft, show_drafts, show_labeled
@@ -167,6 +167,7 @@ app = StApp(
             Route('/llenta', LLenta, name='allenta'),
             Route('/carts', CArts, name='acarts'),
             Route('/cart', CArt, name='acart'),
+            Route('/lcarts', LCArts, name='alcarts'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
@@ -175,10 +176,10 @@ app = StApp(
             Route('/a/{username}/t/{label}', show_l_author, name='lauthor'),
             Route('/c/', show_carts, name='carts'),
             Route('/c/{slug}', show_cart, name='cart'),
+            Route('/c/t/{label}', show_l_carts, name='lcarts'),
             Route('/l/', show_followed, name='lenta'),
             Route('/l/t/{label}', show_l_followed, name='llenta'),
-            Route('/t/{label}', show_labeled_arts, name='labeled-arts'),
-            ]),
+            Route('/t/{label}', show_labeled_arts, name='labeled-arts')]),
         Mount('/blogs', name='blogs', routes=[
             Route('/', show_blogs, name='blogs'),
             Route('/{username}', show_blog, name='blog'),

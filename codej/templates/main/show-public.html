@@ -171,8 +171,8 @@
           <td class="labels">
             {% if topic['labels'] %}
               {% for label in topic['labels'] %}
-              <a href="{#{{ url_for(
-                 'blogs:blog-l', username=topic['author'], label=label) }}#}">
+              <a href="{{ url_for(
+                 'blogs:blog-l', username=topic['author'], label=label) }}">
                 {{- label -}}</a>{%- if not loop.last -%}, {%- endif -%}
               {% endfor %}
             {% else %}
