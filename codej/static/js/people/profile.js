@@ -56,6 +56,10 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '#pm-message', function() {
+      $(this).blur();
+      window.location.assign($(this).data().url);
+    });
     $('body').on('click', '#make-friend', function() {
       $(this).blur();
       $.ajax({

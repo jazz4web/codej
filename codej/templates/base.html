@@ -133,6 +133,13 @@
                     <a id="profilel" href="{{ url_for(
                       'people:profile', username=cu.username)}}">Профиль</a>
                   </li>
+                  {%- if cu['weight'] > 45 -%}
+                    <li>
+                      <a href="{{ url_for('pm:conversations') }}">
+                        Приваты
+                      </a>
+                    </li>
+                  {%- endif -%}
                   <li role="separator" class="divider"></li>
                   <li>
                     <a id="logout" href="/?realm=logout">Выйти</a>

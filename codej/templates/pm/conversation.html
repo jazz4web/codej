@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Приват с {{ username }}{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/pm/conversation.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/conversation.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",username="{{ username }}",page={{ page }},nopage="{{ nopage }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/pm/conversation.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/ping-user.js',
+             'js/pm/conversation.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
