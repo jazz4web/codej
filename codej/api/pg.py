@@ -8,11 +8,126 @@ from validate_email import validate_email
 from ..auth.attri import groups
 from ..common.aparsers import (
     iter_pages, parse_pic_filename, parse_title, parse_units, parse_url)
+from ..common.flashed import set_flashed
 from ..common.random import get_unique_s
 from ..drafts.attri import status
-from .md import check_text, parse_md
+from .md import check_text, html_ann, parse_md
 from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
+
+NOT_RECEIVED = '''SELECT id FROM messages WHERE sender_id = $1
+                    AND recipient_id = $2 AND postponed = false
+                    AND received IS NULL'''
+
+
+async def edit_pm(conn, mid, text):
+    loop = asyncio.get_running_loop()
+    html = await loop.run_in_executor(
+        None, functools.partial(html_ann, text))
+    now = datetime.utcnow()
+    await conn.execute(
+        '''UPDATE messages SET sent = $1, body = $2,
+                               html = $3, postponed = false
+             WHERE id = $4''',
+        now, text, html, mid)
+
+
+async def send_message(conn, sender, recipient, text):
+    loop = asyncio.get_running_loop()
+    html = await loop.run_in_executor(
+        None, functools.partial(html_ann, text))
+    now = datetime.utcnow()
+    m = await conn.fetchval(
+        '''SELECT id FROM messages
+             WHERE sender_id IS NULL AND recipient_id IS NULL''')
+    if m:
+        await conn.execute(
+            '''UPDATE messages
+                 SET sent = $1, received = $2, body = $3, html = $4,
+                     postponed = false, removed_by_sender = false,
+                     removed_by_recipient = false, sender_id = $5,
+                     recipient_id = $6 WHERE id = $7''',
+            now, None, text, html, sender, recipient, m)
+    else:
+        await conn.execute(
+            '''INSERT INTO messages
+                 (sent, received, body, html, sender_id, recipient_id)
+                 VALUES ($1, $2, $3, $4, $5, $6)''',
+            now, None, text, html, sender, recipient)
+
+
+async def select_m(
+        request, conn, sender, recipient, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT u.id AS uid, u.username, u.weight,
+                  m.id AS mid, m.sent AS sent, m.received, m.html,
+                  m.postponed, m.sender_id, m.recipient_id
+             FROM users AS u, messages AS m
+               WHERE u.id = m.sender_id
+                 AND m.sender_id = $1
+                 AND m.recipient_id = $2
+                 AND m.postponed = false
+                 AND m.removed_by_recipient = false
+           UNION
+           SELECT u.id AS uid, u.username, u.weight,
+                  m.id AS mid, m.sent AS sent, m.received, m.html,
+                  m.postponed, m.sender_id, m.recipient_id
+             FROM users AS u, messages AS m
+               WHERE u.id = m.sender_id
+                 AND m.sender_id = $2
+                 AND m.recipient_id = $1
+                 AND m.postponed = false
+                 AND m.removed_by_sender = false
+           ORDER BY sent ASC LIMIT $3 OFFSET $4''',
+        recipient, sender, per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['messages'] = [
+            {'last': step == len(query) - 1,
+             'author_id': record.get('uid'),
+             'author_username': record.get('username'),
+             'author_perms': record.get('permissions'),
+             'ava': request.url_for(
+                 'ava', username=record.get('username'), size=98)._url,
+             'id': record.get('mid'),
+             'sent': f'{record.get("sent").isoformat()}Z'
+                if record.get('sent') else None,
+             'received': f'{record.get("received").isoformat()}Z'
+                if record.get('received') else None,
+             'html': record.get('html'),
+             'postponed': record.get('postponed'),
+             'sender': record.get('sender_id'),
+             'recipient': record.get('recipient_id')}
+            for step, record in enumerate(query)]
+
+
+async def check_outgoing(conn, sender, recipient):
+    q = await conn.fetchval(NOT_RECEIVED, sender, recipient)
+    return bool(q)
+
+
+async def receive_incomming(conn, sender, recipient):
+    i = await conn.fetchval(NOT_RECEIVED, sender, recipient)
+    if i:
+        await conn.execute(
+            'UPDATE messages SET received = $1 WHERE id = $2',
+            datetime.utcnow(), i)
+        return True
+    return False
+
+
+async def check_postponed(conn, sender, recipient):
+    p = await conn.fetchval(
+        '''SELECT id FROM messages WHERE sender_id = $1
+             AND recipient_id = $2
+             AND postponed = true''', sender, recipient)
+    if p:
+        await conn.execute(
+            'UPDATE messages SET postponed = false, sent = $1 WHERE id = $2',
+            datetime.utcnow(), p)
 
 
 async def select_l_carts(

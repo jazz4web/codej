@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_pv %}
 
 {%- block title_part -%}Приват с {{ username }}{%- endblock title_part -%}
 
@@ -7,6 +8,20 @@
   {%- assets filters='cssmin', output='generic/css/pm/conversation.css',
              'css/base.css',
              'css/main-container.css',
+             'css/flashed-error.css',
+             'css/flashed-alert.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/form-help.css',
+             'css/form-labeled.css',
+             'css/next-block.css',
+             'css/today-field.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/entity-text-block.css',
+             'css/pygments.css',
+             'css/pagination.css',
              'css/conversation.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -14,6 +29,155 @@
 
 {%- block templates -%}
   {{- super() -}}
+  <script id="editpmt" type="text/template">
+    <div id="edit-message"
+         class="content-block entity-block to-be-hidden next-block">
+      <h1>
+        Отредактируйте своё последнее сообщение
+      </h1>
+      <div class="block-body">
+        <div class="today-field"></div>
+        <div class="form-help">
+          <p>
+            Отредактируйте текст и нажмите кнопку "Сохранить", если передумали
+            редактировать, нажмите кнопку "Отменить" или удалите сообщение.
+          </p>
+        </div>
+        <div class="form-form">
+          <div class="form-group">
+            <textarea id="pm-editor-edit"
+                      placeholder="введите текст сообщения"
+                      class="form-control"
+                      rows="10"><% text %></textarea>
+          </div>
+          <div class="form-group submit-group">
+            <button id="pm-editor-submit"
+                    type="button"
+                    data-id="<% id %>"
+                    class="btn btn-primary">
+              Сохранить
+            </button>
+            <button id="cancel-edit"
+                    type="button"
+                    class="btn btn-default">
+              Отменить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+  <script id="convt" type="text/template">
+    <% #pagination.messages %>
+      <div class="entity-block
+                  <% #last %>last-pm<% /last %>">
+        <div class="entity-attributes">
+          <div class="author-avatar avatar"
+               style="background:url(<% ava %>)"></div>
+          <div class="entity-info">
+            <h4>
+              <a class="author-profile-link"
+                 href="/people/<% author_username %>"><% author_username %></a>
+            </h4>
+            <div class="info-line-block personal-details">
+              <table>
+                <tbody>
+                  <tr>
+                    <td><span class="date-info">Отправлено:&nbsp;</span></td>
+                    <td>
+                      <span class="date-info
+                                   date-field"><% sent %></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="date-info">Получено:&nbsp;</span></td>
+                    <td>
+                      <% #received %>
+                        <span class="date-info
+                                     date-field"><% received %></span>
+                      <% /received %>
+                      <% ^received %>
+                        <span class="date-info">&ndash;</span>
+                      <% /received %>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="bottom-line footer-bottom"></div>
+        </div>
+        <% #incomming %>
+          <% #last %>
+            <div class="flashed-alert next-block">
+              Получено новое сообщение.
+            </div>
+          <% /last %>
+        <% /incomming %>
+        <div class="pm-text entity-text-block">
+          <%{ html }%>
+        </div>
+        <div class="pm-options">
+          <button type="button"
+                  title="удалить"
+                  class="btn btn-sm btn-default trash-button">
+            <span class="glyphicon glyphicon-trash"
+                  aria-hidden="true"></span>
+          </button>
+          <button type="button"
+                  title="удалить безвозвратно"
+                  data-id="<% id %>"
+                  class="btn btn-sm btn-danger to-be-hidden remove-button">
+            <span class="glyphicon glyphicon-trash"
+                  aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    <% /pagination.messages %>
+    <% #nopm %>
+      <div class="flashed-alert"><% nopm %></div>
+    <% /nopm %>
+    <% ^nopm %>
+      <% #blocked %>
+        <div class="flashed-alert"><% blocked %></div>
+      <% /blocked %>
+    <% /nopm %>
+    <% #shform %>
+      <div id="new-message"
+           class="content-block entity-block
+                  {% if flashed %}next-block{% endif %}
+                  <% #pagination.messages %>
+                  to-be-hidden<% /pagination.messages %>">
+        <h1>
+          Новое сообщение пользователю {{ username }}
+        </h1>
+        <div class="today-field"></div>
+        <div class="form-help">
+          <p>
+            Введите в форму текст сообщения и нажмите кнопку "Отправить".
+          </p>
+        </div>
+        <div class="form-form">
+          <div class="form-group">
+            <textarea id="pm-editor"
+                      placeholder="введите текст сообщения"
+                      class="form-control"
+                      rows="10"></textarea>
+          </div>
+          <div class="form-group submit-group">
+            <button id="pm-submit"
+                    type="button"
+                    class="btn btn-primary">
+              Отправить
+            </button>
+          </div>
+        </div>
+      </div>
+    <% /shform %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
 {%- endblock templates -%}
 
 {%- block scripts -%}
@@ -23,6 +187,19 @@
              'js/format-footer.js',
              'js/close-topflashed.js',
              'js/ping-user.js',
+             'js/slide-page.js',
+             'js/check-mc.js',
+             'js/check-browser.js',
+             'js/render-tf.js',
+             'js/check-next.js',
+             'js/adjust-frame.js',
+             'js/set-margin.js',
+             'js/adjust-image.js',
+             'js/scroll-panel.js',
+             'js/show-error.js',
+             'js/format-datetime.js',
+             'js/render-pv.js',
+             'js/click-image.js',
              'js/pm/conversation.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

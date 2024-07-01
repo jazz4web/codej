@@ -1,0 +1,16 @@
+#pm-editor, #pm-editor-edit {
+  text-align: justify;
+  font-size: 12pt;
+}
+
+.entity-attributes {
+  margin: 0;
+}
+
+.pm-text {
+  margin: 4px 0 0;
+}
+
+.pm-options {
+  margin: 4px 0 0;
+}
