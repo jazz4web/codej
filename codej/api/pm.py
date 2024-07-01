@@ -9,8 +9,74 @@ from .pg import (
     check_last, check_outgoing, check_postponed, check_rel,
     edit_pm, receive_incomming, select_m, send_message)
 
+USERNAME = 'SELECT username FROM users WHERE id = $1'
+REM = '''UPDATE messages SET received = null, postponed = false,
+                             removed_by_sender = false,
+                             removed_by_recipient = false,
+                             sender_id = null,
+                             recipient_id = null WHERE id = $1'''
+
 
 class Conversation(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'done': None}
+        d = await request.form()
+        last, page = int(d.get('last', '0')), int(d.get('page', '0'))
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 50:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            '''SELECT id, received, removed_by_sender, removed_by_recipient,
+                      sender_id, recipient_id
+                 FROM messages WHERE id = $1''', int(d.get('mid', '0')))
+        if target is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        if target.get('sender_id') != cu.get('id') and \
+                target.get('recipient_id') != cu.get('id'):
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        url = None
+        if target.get('sender_id') == cu.get('id'):
+            recipient = await conn.fetchval(
+                USERNAME, target.get('recipient_id'))
+            if target.get('received') is None or \
+                    target.get('removed_by_recipient'):
+                await conn.execute(REM, target.get('id'))
+            else:
+                await conn.execute(
+                    '''UPDATE messages SET removed_by_sender = true
+                         WHERE id = $1''', target.get('id'))
+            url = request.url_for('pm:conversation', username=recipient)._url
+        if target.get('recipient_id') == cu.get('id'):
+            sender = await conn.fetchval(USERNAME, target.get('sender_id'))
+            if target.get('removed_by_sender'):
+                await conn.execute(REM, target.get('id'))
+            else:
+                await conn.execute(
+                    '''UPDATE messages SET removed_by_recipient = true
+                         WHERE id = $1''', target.get('id'))
+            url = request.url_for('pm:conversation', username=sender)._url
+        res['done'] = True
+        if page:
+            if last == 1:
+                page = page - 1 or 1
+            res['redirect'] = f'{url}?page={page}'
+        else:
+            res['redirect'] = url
+        await set_flashed(request, 'Удалено успешно.')
+        await conn.close()
+        return JSONResponse(res)
+
     async def get(self, request):
         conn = await get_conn(request.app.config)
         res = {'cu': await checkcu(

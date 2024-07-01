@@ -91,6 +91,40 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    $('body').on('click', '.remove-button', function() {
+      $(this).blur();
+      let p;
+      if (window.location.search) {
+        p = window.location.search
+          .split('page')[1].split('&')[0].slice(1)[0];
+      }
+      let mid = $(this).data().id;
+      $.ajax({
+        method: 'DELETE',
+        url: '/api/conv',
+        data: {
+          page: p ? p : 0,
+          mid: mid,
+          last: $('.pm-block').length,
+          auth: window.localStorage.getItem('token')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.replace(data.redirect);
+          } else {
+            let html = Mustache.render($('#ealertt').html(), data);
+            $('#main-container').append(html);
+            showError('.content-block', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '.trash-button', function() {
+      $(this).blur();
+      showHideButton($(this), '.remove-button');
+    });
     $('body').on('click', '.entity-text-block img', clickImage);
     $('body').on('click', '.page-link', function(event) {
       event.preventDefault();
