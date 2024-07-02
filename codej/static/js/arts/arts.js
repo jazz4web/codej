@@ -28,4 +28,5 @@ $(function() {
     let p = event.data.page - 1;
     window.location.assign('/arts/?page=' + p);
   });
+  if (window.localStorage.getItem('token')) checkIncomming();
 });

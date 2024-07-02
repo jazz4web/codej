@@ -61,4 +61,5 @@ $(function() {
     let p = event.data.page - 1;
     window.location.assign('/people/?page=' + p);
   });
+  if (token) checkIncomming();
 });

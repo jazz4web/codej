@@ -12,6 +12,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDrafts(dt, '/api/lenta', page);
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '.page-link', function(event) {
       event.preventDefault();
       let th = $(this).parent();

@@ -65,6 +65,23 @@ class Conversations(HTTPEndpoint):
         await conn.close()
         return JSONResponse(res)
 
+    async def post(self, request):
+        res = {'pm': 0}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu.get('weight') >= 50:
+            n = await conn.fetchval(
+                '''SELECT count(*) FROM messages
+                     WHERE recipient_id = $1
+                       AND received IS NULL
+                       AND postponed = false
+                       AND removed_by_sender = false
+                       AND removed_by_recipient = false''', cu.get('id'))
+            await conn.close()
+            res['pm'] = n
+        return JSONResponse(res)
+
 
 class Conversation(HTTPEndpoint):
     async def delete(self, request):

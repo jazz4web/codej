@@ -31,4 +31,5 @@ $(function() {
     let p = event.data.page - 1;
     window.location.assign('/arts/t/' + event.data.label + '?page=' + p);
   });
+  if (window.localStorage.getItem('token')) checkIncomming();
 });

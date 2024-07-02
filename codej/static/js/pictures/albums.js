@@ -74,6 +74,7 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '#find-submit', function() {
       $(this).blur();
       let suffix = $('#find-input').val();

@@ -44,6 +44,7 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '.remove-button', function() {
       $(this).blur();
       let p = page;

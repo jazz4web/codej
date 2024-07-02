@@ -74,4 +74,5 @@ $(function() {
       '/blogs/' + event.data.username + '/t/' +
       event.data.label + '?page=' + p);
   });
+  if (token) checkIncomming();
 });

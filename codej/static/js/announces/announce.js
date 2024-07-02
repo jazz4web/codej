@@ -45,6 +45,7 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    checkIncomming();
     $('body').on('click', '#remove-button', function() {
       $(this).blur();
       $.ajax({

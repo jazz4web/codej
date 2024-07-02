@@ -59,4 +59,5 @@ $(function() {
     let p = event.data.page - 1;
     window.location.assign('/blogs/?page=' + p);
   });
+  if (token) checkIncomming();
 });

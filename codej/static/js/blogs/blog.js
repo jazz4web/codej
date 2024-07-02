@@ -64,5 +64,5 @@ $(function() {
     let p = event.data.page - 1;
     window.location.assign('/blogs/' + event.data.username + '?page=' + p);
   });
-
+  if (token) checkIncomming();
 });

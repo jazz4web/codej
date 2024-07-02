@@ -55,6 +55,7 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body')
       .on('click', '.remove-button', {page: page, suffix: suffix}, removeThis);
     $('body').on('click', '.trash-button', function() {

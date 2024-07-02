@@ -20,4 +20,7 @@ $(function() {
   if ($('.today-field').length) renderTF('.today-field', dt);
   $('body').on('click', '.closeable', closeTopFlashed);
   checkMC(860);
+  if (window.localStorage.getItem('token')) {
+    checkIncomming();
+  }
 });

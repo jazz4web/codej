@@ -12,6 +12,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDrafts(dt, '/api/drafts', page);
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '.entity-alias a', function(event) {
       event.preventDefault();
     });

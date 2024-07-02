@@ -22,6 +22,24 @@
       {%- endassets -%}
     {%- endblock styles -%}
     {%- block templates -%}
+      <script id="pmalertt" type="text/template">
+        <% ^flashed %>
+        <div class="top-flashed-block">
+          <div class="flashed-message">
+            <div class="flashed-alert">
+              У Вас есть непрочитанные <a href="/pm/">приватные сообщения</a>.
+            </div>
+          </div>
+        </div>
+        <% /flashed %>
+        <% #flashed %>
+        <div class="flashed-message">
+          <div class="flashed-alert">
+            У Вас есть непрочитанные <a href="/pm/">приватные сообщения</a>.
+          </div>
+        </div>
+        <% /flashed %>
+      </script>
       <script id="ealertt" type="text/template">
         <div id="ealert" class="flashed-error to-be-hidden">
           <%{ message }%>

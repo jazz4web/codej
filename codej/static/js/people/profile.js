@@ -56,6 +56,7 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '#pm-message', function() {
       $(this).blur();
       window.location.assign($(this).data().url);

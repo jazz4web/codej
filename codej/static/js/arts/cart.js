@@ -12,6 +12,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showArt('/api/cart', slug);
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '.copy-link', showCopyForm);
     $('body').on('click', '.entity-text-block img', clickImage);
     $('body').on('click', '#move-screen-up', function() {

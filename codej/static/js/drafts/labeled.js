@@ -12,6 +12,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showLabeledDrafts('/api/labels', page, label, dt);
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '.page-link',{label: label}, function(event) {
       event.preventDefault();
       let th = $(this).parent();

@@ -12,6 +12,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug, dt);
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '#special-case', {slug: slug}, function(event) {
       $(this).blur();
       undressLinks(event.data.slug);
