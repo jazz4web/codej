@@ -22,6 +22,14 @@ $(function() {
         slidePage('#ealert');
       }
     },
+    complete: function() {
+      if (!$('#main-container').children().length) {
+        let data = {'message': 'Проверьте ссылку.'}
+        let html = Mustache.render($('#ealertt').html(), data);
+        $('#main-container').removeClass('nonlisted').append(html);
+        slidePage('#ealert');
+      }
+    },
     dataType: 'json'
   });
   $('body').on('click', '#crp-submit', function() {
@@ -38,7 +46,6 @@ $(function() {
         url: '/api/setpasswd',
         data: tee,
         success: function(data) {
-          console.log(data);
           if (data.done) {
             window.location.replace('/');
           } else {

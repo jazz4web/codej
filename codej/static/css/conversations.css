@@ -1,0 +1,27 @@
+.friends-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.friends-table th {
+  text-align: center;
+  border-bottom: 2px solid #dddddd;
+  padding: 8px 4px;
+}
+
+.friends-table td {
+  padding: 6px 4px 2px;
+  text-align: center;
+}
+
+.new-input {
+  background-color: moccasin;
+}
+
+.new-output {
+  background-color: aliceblue;
+}
+
+.bordered {
+  border-bottom: 1px dashed silver;
+}

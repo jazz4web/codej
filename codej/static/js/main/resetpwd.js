@@ -22,6 +22,14 @@ $(function() {
         checkMC(860);
       }
     },
+    complete: function() {
+      if (!$('#main-container').children().length) {
+        let data = {'message': 'Проверьте ссылку.'}
+        let html = Mustache.render($('#ealertt').html(), data);
+        $('#main-container').removeClass('nonlisted').append(html);
+        slidePage('#ealert');
+      }
+    },
     dataType: 'json'
   });
   $('body').on('click', '#rsp-submit', function() {

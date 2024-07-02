@@ -20,6 +20,28 @@ NOT_RECEIVED = '''SELECT id FROM messages WHERE sender_id = $1
                     AND received IS NULL'''
 
 
+async def select_conversations(conn, uid, query, target, page, per_page, last):
+    query = await conn.fetch(query, uid, per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['conversations'] = [
+            {'company': record.get('username'),
+             'sent': f'{record.get("sent").isoformat()}Z',
+             'received': f'{record.get("received").isoformat()}Z'
+             if record.get('received') else None,
+             'recipient': record.get('recipient_id'),
+             'sender': record.get('sender_id'),
+             'new_output': record.get('received') is None
+                     and record.get('sender_id') == uid,
+             'new_input': record.get('received') is None
+                     and record.get('recipient_id') == uid,
+             'bordered': step < len(query) - 1}
+            for step, record in enumerate(query)]
+
+
 async def edit_pm(conn, mid, text):
     loop = asyncio.get_running_loop()
     html = await loop.run_in_executor(

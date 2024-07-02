@@ -30,7 +30,7 @@ from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search, Ustat
-from .api.pm import Conversation
+from .api.pm import Conversation, Conversations
 from .api.tasks import check_swapped, rem_expired_sessions
 from .arts.views import (
     show_art, show_arts, show_author, show_cart,
@@ -171,6 +171,7 @@ app = StApp(
             Route('/cart', CArt, name='acart'),
             Route('/lcarts', LCArts, name='alcarts'),
             Route('/conv', Conversation, name='aconv'),
+            Route('/convs', Conversations, name='aconvs')
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
