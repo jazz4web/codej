@@ -1,0 +1,62 @@
+#comment-editor, #answer-editor {
+  text-align: justify;
+  font-size: 12pt;
+}
+
+#entity-commentaries {
+  margin-left: -12px;
+}
+
+.commentaries-branch {
+  margin-left: 12px;
+}
+
+.root-commentary {
+  background-color: ivory;
+  border-radius: 3px;
+  box-shadow: 0 0 4px lightsalmon;
+  padding: 6px;
+  margin: 6px 0 0;
+}
+
+.deleted-root-commentary {
+  margin: 6px 0 0;
+  text-align: left;
+  text-shadow: 0 0 3px lightgray;
+  font-style: italic;
+}
+
+.commentary-author-avatar {
+  width: 48px;
+  height: 48px;
+  float: left;
+}
+
+.commentary-attributes {
+  margin-left: 56px;
+  padding: 0 0 2px 0;
+}
+
+.commentary-author-name {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.commentary-info-line {
+  font-size: 0.9em;
+  font-style: italic;
+  text-shadow: 0 0 3px #d9dcec;
+}
+
+.commentary-body {
+  text-align: justify;
+  margin: 6px 0 0;
+}
+
+.commentary-options {
+  margin: 0;
+}
+
+.new-answer-block {
+  margin: 6px 0 0;
+}

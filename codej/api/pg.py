@@ -11,13 +11,149 @@ from ..common.aparsers import (
 from ..common.flashed import set_flashed
 from ..common.random import get_unique_s
 from ..drafts.attri import status
-from .md import check_text, html_ann, parse_md
+from .md import check_text, html_ann, html_comm, parse_md
 from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 NOT_RECEIVED = '''SELECT id FROM messages WHERE sender_id = $1
                     AND recipient_id = $2 AND postponed = false
                     AND received IS NULL'''
+
+
+async def can_answer(conn, art, cu, author):
+    if cu and cu.get('id') != author.get('id'):
+        artrel = await check_rel(conn, art.get('author_id'), cu.get('id'))
+        authrel = await check_rel(conn, author.get('id'), cu.get('id'))
+        if (cu.get('weight') >= 45 and
+            (not artrel['blocker'] and not artrel['blocked']) and
+            (not authrel['blocker'] and not authrel['blocked'])) or \
+           cu.get('weight') == 255 or \
+           (cu.get('weight') >= 45 and
+            cu.get('id') == art.get('author_id')):
+            return True
+    return False
+
+
+async def can_remove(art, cu, author):
+    if cu and art.get('commented'):
+        if cu.get('id') == author.get('id'):
+            return True
+        else:
+            if cu.get('id') == art.get('author_id'):
+                return True
+            if cu.get('weight') >= 200:
+                return True
+    return False
+
+
+async def select_children(request, conn, art, cu, parent, n):
+    branch = n + 1
+    query = await conn.fetch(
+        '''SELECT u.id AS uid, u.username AS username, u.weight,
+                  c.id AS cid, c.created AS created, c.deleted AS deleted,
+                  c.html AS html
+             FROM commentaries AS c, users AS u
+               WHERE c.parent_id = $1
+                 AND c.article_id = $2
+                 AND u.id = c.author_id
+               ORDER BY created ASC''',
+        parent, art.get('id'))
+    if query:
+        res = list()
+        for record in query:
+            author = {'id': record.get('uid'),
+                      'permissions': record.get('perms'),
+                      'username': record.get('username'),
+                      'ava': request.url_for(
+                          'ava', username=record.get('username'),
+                          size=48)._url}
+            co = {'author': author,
+                  'branch-len': branch,
+                  'id': record.get('cid'),
+                  'created': f'{record.get("created").isoformat()}Z',
+                  'deleted': record.get('deleted'),
+                  'html': record.get('html'),
+                  'children': await select_children(
+                      request, conn, art, cu, record.get('cid'), branch),
+                  'rem': await can_remove(art, cu, author),
+                  'answer': await can_answer(
+                      conn, art, cu, author) and branch < 11}
+            co['tools'] = co.get('rem') or co.get('answer')
+            res.append(co)
+        return res
+
+
+async def select_commentaries(request, conn, art, cu):
+    branch = 0
+    query = await conn.fetch(
+        '''SELECT u.id AS uid, u.username AS username, u.weight,
+                  c.id AS cid, c.created AS created, c.deleted AS deleted,
+                  c.html AS html
+             FROM commentaries AS c, users AS u
+               WHERE parent_id IS NULL
+                 AND u.id = c.author_id
+                 AND article_id = $1
+               ORDER BY created ASC''', art.get('id'))
+    if query:
+        res = list()
+        for record in query:
+            author = {'id': record.get('uid'),
+                      'weight': record.get('weight'),
+                      'username': record.get('username'),
+                      'ava': request.url_for(
+                          'ava', username=record.get('username'),
+                          size=48)._url}
+            co = {'author': author,
+                  'branch-len': branch,
+                  'id': record.get('cid'),
+                  'created': f'{record.get("created").isoformat()}Z',
+                  'deleted': record.get('deleted'),
+                  'html': record.get('html'),
+                  'children': await select_children(
+                      request, conn, art, cu,
+                      record.get('cid'), branch),
+                  'rem': await can_remove(art, cu, author),
+                  'answer': await can_answer(
+                      conn, art, cu, author) and branch < 11}
+            co['tools'] = co.get('rem') or co.get('answer')
+            res.append(co)
+        return res
+
+
+async def send_comment(conn, text, sender, art, parent):
+    loop = asyncio.get_running_loop()
+    html = await loop.run_in_executor(
+        None, functools.partial(html_comm, text))
+    now = datetime.utcnow()
+    c = await conn.fetchval(
+        '''SELECT id FROM commentaries
+             WHERE author_id IS NULL
+               AND article_id IS NULL
+               AND parent_id IS NULL''')
+    if c:
+        await conn.execute(
+            '''UPDATE commentaries
+                 SET created = $1, html = $2, author_id = $3,
+                     article_id = $4, parent_id = $5, admined = false
+                 WHERE id = $6''',
+            now, html, sender, art, parent, c)
+    else:
+        await conn.execute(
+            '''INSERT INTO commentaries
+                 (created, html, author_id, article_id, parent_id)
+                 VALUES($1, $2, $3, $4, $5)''',
+            now, html, sender, art, parent)
+
+
+async def check_art(conn, slug):
+    return await conn.fetchrow(
+        '''SELECT a.id, a.author_id, a.commented, u.weight
+             FROM articles AS a, users AS u
+             WHERE a.slug = $1
+               AND u.id = a.author_id
+               AND a.commented = true
+               AND a.state IN ($2, $3, $4)''',
+        slug, status.pub, status.priv, status.ffo)
 
 
 async def select_conversations(conn, uid, query, target, page, per_page, last):

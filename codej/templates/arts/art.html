@@ -20,6 +20,7 @@
              'css/public.css',
              'css/next-block.css',
              'css/art-announce.css',
+             'css/commentaries.css',
              'css/pygments.css',
              'css/art.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -29,6 +30,92 @@
 
 {%- block templates -%}
   {{- super() -}}
+  <script id="brancht" type="text/template">
+    <div id="branch-<% id %>" class="commentaries-branch">
+      <% #deleted %>
+        <div class="deleted-root-commentary next-block">
+          Комментарий удалён
+        </div>
+      <% /deleted %>
+      <% ^deleted %>
+        <div class="root-commentary">
+          <div class="commentary-head">
+            <div class="commentary-author-avatar avatar"
+                 style="background: url(<% author.ava %>)"></div>
+          </div>
+          <div class="commentary-attributes">
+            <h4 class="commentary-author-name">
+              <a class="author-profile-link"
+                 href="/people/<% author.username %>"><% author.username %></a>
+            </h4>
+            <div class="commentary-info-line date-field">
+              <% created %>
+            </div>
+          </div>
+          <div class="footer-bottom"></div>
+          <div class="commentary-body entity-text-block">
+            <%{ html }%>
+          </div>
+          <% #tools %>
+            <div class="commentary-options">
+              <% #answer %>
+              <button type="button"
+                      title="ответить"
+                      data-id="<% id %>"
+                      class="btn btn-xs btn-primary answer-button">
+                <span class="glyphicon glyphicon-comment"
+                      aria-hidden="true"></span>
+              </button>
+              <% /answer %>
+              <% #rem %>
+              <button type="button"
+                      title="удалить"
+                      class="btn btn-xs btn-default trash-button">
+                <span class="glyphicon glyphicon-trash"
+                      aria-hidden="true"></span>
+              </button>
+              <button type="button"
+                      title="удалить безвозвратно"
+                      data-id="<% id %>"
+                      class="btn btn-xs btn-danger to-be-hidden
+                             remove-commentary">
+                <span class="glyphicon glyphicon-trash"
+                      aria-hidden="true"></span>
+              </button>
+              <% /rem %>
+            </div>
+          <% /tools %>
+        </div>
+      <% /deleted %>
+    </div>
+  </script>
+  <script id="scommentt" type="text/template">
+    <% #perm %>
+      <div class="entity-block next-block new-comment-block to-be-hidden">
+        <div class="new-comment-form">
+          <div class="form-group">
+            <textarea id="comment-editor"
+                      class="form-control"
+                      placeholder="введите текст комментария"
+                      rows="8"></textarea>
+          </div>
+          <div class="form-group submit-group">
+            <button class="btn btn-primary"
+                    type="button"
+                    id="comment-submit"
+                    data-aid="<% article_id %>">
+              Отправить
+            </button>
+          </div>
+        </div>
+      </div>
+    <% /perm %>
+    <% ^perm %>
+      <div class="flashed-error to-be-hidden comment-alert">
+        <% message %>
+      </div>
+    <% /perm %>
+  </script>
   <script id="artt" type="text/template">
     <div id="topic-head" class="content-block">
       <h1 title="<% art.title %>">
@@ -294,6 +381,8 @@
              'js/show-error.js',
              'js/undress-links.js',
              'js/censor-this.js',
+             'js/show-commentaries.js',
+             'js/show-children.js',
              'js/arts/art.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

@@ -103,3 +103,30 @@ def html_ann(md_text):
                     DelInsExtension()],
         output_format='html5')
     return clean_ann(html).replace('&amp;', '&')
+
+
+def clean_comm(html):
+    callbacks = [nofollow, target_blank, prevent_py, prevent_md]
+    tags = ['a', 'blockquote', 'br', 'code', 'del', 'div',
+            'em', 'iframe', 'img', 'ins', 'hr', 'li',
+            'ol', 'pre', 'span', 'strong', 'ul', 'p']
+    attrs = {'*': ['class'],
+             'a': ['href', 'title'],
+             'abbr': ['title'],
+             'iframe': ['src'],
+             'img': ['src', 'alt', 'data-link']}
+    return linkify(
+        clean(html, tags=tags, attributes=attrs),
+        callbacks=callbacks, skip_tags=['pre', 'code', 'iframe'])
+
+
+def html_comm(md_text):
+    html = markdown(
+        md_text,
+        extensions=['markdown.extensions.fenced_code',
+                    'markdown.extensions.nl2br',
+                    'markdown.extensions.md_in_html',
+                    CodeHiliteExtension(use_pytgments=True),
+                    DelInsExtension()],
+        output_format='html5')
+    return clean_comm(html).replace('&amp;', '&')
