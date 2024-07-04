@@ -14,10 +14,74 @@ $(function() {
   $('body').on('click', '.entity-text-block img', clickImage);
   $('body').on('click', '#move-screen-up', moveScreenUp);
   showArt('/api/art', slug, dt);
+  $('body').on('click', '#answer-submit', function() {
+    $(this).blur();
+    let pid = $(this).data().pid;
+    let text = $('#answer-editor').val();
+    if (text) {
+      $.ajax({
+        method: 'PUT',
+        url: '/api/answer',
+        data: {
+          slug: slug,
+          pid: pid,
+          auth: window.localStorage.getItem('token'),
+          text: text
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('.new-answer-block', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    }
+  });
+  $('body').on('click', '#cancel-answer', function() {
+    $(this).blur();
+    let nab = $('.new-answer-block');
+    nab.slideUp('slow', function() {
+      nab.remove();
+    });
+  });
+  $('body').on('click', '.answer-button', function() {
+    $(this).blur();
+    let ncb = $('.new-comment-block');
+    if (ncb.length) ncb.slideUp('slow', function() {ncb.remove();});
+    let par = $(this).parents('.root-commentary');
+    let cid = $(this).data().id;
+    $.ajax({
+      method: 'POST',
+      url: '/api/answer',
+      data: {
+        auth: window.localStorage.getItem('token'),
+        cid: cid
+      },
+      success: function(data) {
+        let html = Mustache.render($('#sanswert').html(), data);
+        let al = $('.comment-alert');
+        if (al.length) al.remove();
+        let nab = $('.new-answer-block');
+        if (nab.length) nab.slideUp('slow', function() {nab.remove();});
+        par.after(html);
+        if (data.perm) {
+          $('.new-answer-block').slideDown('slow', function() {
+            scrollPanel($('.new-answer-block'));
+          });
+        } else {
+          $('.comment-alert').slideDown('slow');
+        }
+      },
+      dataType: 'json'
+    });
+  });
   $('body').on('click', '#new-comment-add', function() {
     $(this).blur();
-    let nab = $('#new-answer-block');
-    if (nab.length) nab.remove();
+    let nab = $('.new-answer-block');
+    if (nab.length) nab.slideUp('slow', function() {nab.remove();});
     let form = $('.new-comment-block');
     if (form.length) {
       if (form.is(':hidden')) {
