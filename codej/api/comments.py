@@ -4,7 +4,9 @@ from starlette.responses import JSONResponse
 from ..auth.cu import checkcu
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
-from .pg import check_art, check_rel, select_commentaries, send_comment
+from .pg import (
+    can_remove, check_art, check_rel, delete_commentary,
+    select_commentaries, send_comment)
 
 
 class Answer(HTTPEndpoint):
@@ -93,6 +95,50 @@ class Answer(HTTPEndpoint):
 
 
 class Comment(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 45:
+            res['message'] = 'У вас нет права удалять комментарии.'
+            await conn.close()
+            return JSONResponse(res)
+        co = await conn.fetchrow(
+            '''SELECT id, author_id, article_id, parent_id FROM commentaries
+                 WHERE id = $1''', int(d.get('cid', '0')))
+        if co is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        art = await conn.fetchrow(
+            'SELECT commented, author_id FROM articles WHERE id = $1',
+            co.get('article_id'))
+        if art is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        author = await conn.fetchrow(
+            'SELECT id, username FROM users WHERE id = $1',
+            co.get('author_id'))
+        if author is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        if await can_remove(art, cu, author):
+            await delete_commentary(conn, co)
+            res['done'] = True
+            await conn.close()
+            await set_flashed(request, 'Комментарий удалён.')
+            return JSONResponse(res)
+        res['message'] = 'Упс.., действие невозможно.'
+        await conn.close()
+        return JSONResponse(res)
+
     async def get(self, request):
         res = {'commentaries': None}
         conn = await get_conn(request.app.config)

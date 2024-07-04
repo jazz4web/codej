@@ -14,32 +14,6 @@ $(function() {
   $('body').on('click', '.entity-text-block img', clickImage);
   $('body').on('click', '#move-screen-up', moveScreenUp);
   showArt('/api/art', slug, dt);
-  $('body').on('click', '#answer-submit', function() {
-    $(this).blur();
-    let pid = $(this).data().pid;
-    let text = $('#answer-editor').val();
-    if (text) {
-      $.ajax({
-        method: 'PUT',
-        url: '/api/answer',
-        data: {
-          slug: slug,
-          pid: pid,
-          auth: window.localStorage.getItem('token'),
-          text: text
-        },
-        success: function(data) {
-          if (data.done) {
-            window.location.reload();
-          } else {
-            showError('.new-answer-block', data);
-            scrollPanel($('#ealert'));
-          }
-        },
-        dataType: 'json'
-      });
-    }
-  });
   $('body').on('click', '#cancel-answer', function() {
     $(this).blur();
     let nab = $('.new-answer-block');
@@ -119,6 +93,57 @@ $(function() {
     }
   });
   if (window.localStorage.getItem('token')) {
+    $('body').on('click', '.remove-commentary', function() {
+      $(this).blur();
+      let par = $(this).parents('.commentary-options');
+      $.ajax({
+        method: 'DELETE',
+        url: '/api/comment',
+        data: {
+          auth: window.localStorage.getItem('token'),
+          cid: $(this).data().id
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError(par, data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '.trash-button', function() {
+      $(this).blur();
+      showHideButton($(this), '.remove-commentary');
+    });
+    $('body').on('click', '#answer-submit', function() {
+      $(this).blur();
+      let pid = $(this).data().pid;
+      let text = $('#answer-editor').val();
+      if (text) {
+        $.ajax({
+          method: 'PUT',
+          url: '/api/answer',
+          data: {
+            slug: slug,
+            pid: pid,
+            auth: window.localStorage.getItem('token'),
+            text: text
+          },
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('.new-answer-block', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
     $('body').on('click', '#comment-submit', function() {
       $(this).blur();
       let text = $('#comment-editor').val();

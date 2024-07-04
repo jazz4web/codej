@@ -20,6 +20,46 @@ NOT_RECEIVED = '''SELECT id FROM messages WHERE sender_id = $1
                     AND received IS NULL'''
 
 
+async def check_parent(conn, pid):
+    this = await conn.fetchrow(
+        'SELECT id, deleted, parent_id FROM commentaries WHERE id = $1',
+        pid)
+    if this and this.get('deleted'):
+        children = await conn.fetchval(
+            'SELECT count(*) FROM commentaries WHERE parent_id = $1',
+            this.get('id'))
+        if not children:
+            await conn.execute(
+                '''UPDATE commentaries
+                     SET author_id = NULL,
+                         article_id = NULL,
+                         parent_id = NULL,
+                         deleted = false,
+                         admined = false
+                     WHERE id = $1''', this.get('id'))
+            await check_parent(conn, this.get('parent_id', 0))
+
+
+async def delete_commentary(conn, co):
+    children = await conn.fetchval(
+        'SELECT count(*) FROM commentaries WHERE parent_id = $1', co.get('id'))
+    if children:
+        await conn.execute(
+            '''UPDATE commentaries
+                 SET deleted = true, admined = true WHERE id = $1''',
+            co.get('id'))
+    else:
+        await conn.execute(
+            '''UPDATE commentaries
+                 SET author_id = NULL,
+                     article_id = NULL,
+                     parent_id = NULL,
+                     deleted = false,
+                     admined = false
+                 WHERE id = $1''', co.get('id'))
+        await check_parent(conn, co.get('parent_id', 0))
+
+
 async def can_answer(conn, art, cu, author):
     if cu and cu.get('id') != author.get('id'):
         artrel = await check_rel(conn, art.get('author_id'), cu.get('id'))
