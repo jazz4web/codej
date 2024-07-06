@@ -26,7 +26,7 @@ from .api.auth import (
     Login, Logout, LogoutAll, ResetPasswd,
     RequestEm, SetPasswd)
 from .api.blogs import Authors, Blog, LBlog
-from .api.comments import Answer, Comment
+from .api.comments import Answer, Comment, Comments
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import People, Profile, Relation
@@ -39,6 +39,7 @@ from .arts.views import (
     show_l_author, show_l_followed)
 from .blogs.views import show_blog, show_blogs, show_l_blog
 from .captcha.views import show_captcha
+from .comments.views import show_comments
 from .drafts.views import show_draft, show_drafts, show_labeled
 from .main.views import (
     jump, show_avatar, show_favicon, show_index,
@@ -175,6 +176,7 @@ app = StApp(
             Route('/convs', Conversations, name='aconvs'),
             Route('/comment', Comment, name='acomment'),
             Route('/answer', Answer, name='aanswer'),
+            Route('/comments', Comments, name='acomments')
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),
@@ -191,6 +193,8 @@ app = StApp(
             Route('/', show_blogs, name='blogs'),
             Route('/{username}', show_blog, name='blog'),
             Route('/{username}/t/{label}', show_l_blog, name='blog-l')]),
+        Mount('/comments', name='comments', routes=[
+            Route('/', show_comments, name='comments')]),
         Mount('/drafts', name='drafts', routes=[
             Route('/', show_drafts, name='drafts'),
             Route('/{slug}', show_draft, name='draft'),

@@ -20,6 +20,34 @@ NOT_RECEIVED = '''SELECT id FROM messages WHERE sender_id = $1
                     AND received IS NULL'''
 
 
+async def select_comments(request, conn, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT u.username AS username, u.weight,
+                  c.id AS cid, c.created AS created, c.html AS html,
+                  a.slug AS slug
+             FROM commentaries AS c, users AS u, articles AS a
+               WHERE u.id = c.author_id
+                 AND a.id = c.article_id
+                 AND c.admined = false
+            ORDER BY c.created ASC LIMIT $1 OFFSET $2''',
+        per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['comments'] = [
+            {'username': record.get('username'),
+             'ava': request.url_for(
+                 'ava', username=record.get('username'), size=48)._url,
+             'id': record.get('cid'),
+             'created': f'{record.get("created").isoformat()}Z',
+             'html': record.get('html'),
+             'art': request.url_for('arts:art', slug=record.get('slug'))._url,
+             'rem': record.get('weight') < 250}
+            for record in query]
+
+
 async def check_parent(conn, pid):
     this = await conn.fetchrow(
         'SELECT id, deleted, parent_id FROM commentaries WHERE id = $1',
