@@ -142,6 +142,27 @@
                 </ul>
               </li>
             {%- endif -%}
+            {%- if cu['weight'] >= 250 -%}
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Webmaster <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="{{ url_for('admin:logs', log='access.log') }}"
+                       target="_blank">
+                      Текущий лог
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('admin:logs', log='previous.log') }}"
+                       target="_blank">
+                      Предыдущий лог
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            {%- endif -%}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
