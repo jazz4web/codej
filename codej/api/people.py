@@ -61,6 +61,63 @@ class Relation(HTTPEndpoint):
         await conn.close()
         return JSONResponse(res)
 
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            'SELECT id, username, weight FROM users WHERE id = $1',
+            int(d.get('uid', '0')))
+        if target is None:
+            res['message'] = 'Запрос содержит неверные данные.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') >= 250 or target.get('weight') >= 250:
+            res['message'] = 'Вам недоступно это действие.'
+            await conn.close()
+            return JSONResponse(res)
+        rel = await check_rel(conn, cu.get('id'), target.get('id'))
+        if rel['friend']:
+            res['message'] = 'Вы не можете блокировать друзей.'
+            await conn.close()
+            return JSONResponse(res)
+        if rel['blocker']:
+            await conn.execute(
+                '''DELETE FROM blockers
+                     WHERE target_id = $1 AND blocker_id = $2''',
+                target.get('id'), cu.get('id'))
+            await set_flashed(request, 'Блокировка снята.')
+        else:
+            await conn.execute(
+                '''INSERT INTO blockers (target_id, blocker_id)
+                     VALUES ($1, $2)''', target.get('id'), cu.get('id'))
+            if await conn.fetchrow(
+                    '''SELECT * FROM followers
+                         WHERE author_id = $1 AND follower_id = $2''',
+                    cu.get('id'), target.get('id')):
+                await conn.execute(
+                    '''DELETE FROM followers
+                         WHERE author_id = $1 AND follower_id = $2''',
+                    cu.get('id'), target.get('id'))
+            if await conn.fetchrow(
+                    '''SELECT * FROM friends
+                         WHERE author_id = $1 AND friend_id = $2''',
+                    target.get('id'), cu.get('id')):
+                await conn.execute(
+                    '''DELETE FROM friends
+                         WHERE author_id = $1 AND friend_id = $2''',
+                    target.get('id'), cu.get('id'))
+            await set_flashed(
+                request, f'{target.get("username")} заблокирован.')
+        await conn.close()
+        res['done'] = True
+        return JSONResponse(res)
+
 
 class People(HTTPEndpoint):
     async def get(self, request):

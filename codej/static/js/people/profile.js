@@ -57,6 +57,26 @@ $(function() {
   });
   if (window.localStorage.getItem('token')) {
     checkIncomming();
+    $('body').on('click', '#blocking-button', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/rel',
+        data: {
+          auth: window.localStorage.getItem('token'),
+          uid: $(this).data().uid
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#actions-block', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '#pm-message', function() {
       $(this).blur();
       window.location.assign($(this).data().url);
