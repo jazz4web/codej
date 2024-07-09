@@ -70,7 +70,7 @@ class Conversations(HTTPEndpoint):
         d = await request.form()
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, d.get('auth'))
-        if cu.get('weight') >= 50:
+        if cu and cu.get('weight') >= 50:
             n = await conn.fetchval(
                 '''SELECT count(*) FROM messages
                      WHERE recipient_id = $1

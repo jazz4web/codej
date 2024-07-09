@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Панель вебмастера{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/admin/tools.css',
+             'css/base.css',
+             'css/main-container.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/entity-block.css',
+             'css/form-help.css',
+             'css/form-labeled.css',
+             'css/aoptions.css',
+             'css/next-block.css',
+             'css/tools.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="toolst" type="text/template">
+    <div class="editor-forms-block entity-block {% if flashed %}next-block
+                                                {%- endif -%}">
+      <div id="new-user-editor">
+        <div class="form-help">
+          <p>
+            Здесь можно создать новый аккаунт пользователя, для этого
+            заполните форму ниже. Имейте ввиду, псевдоним должен быть
+            уникальным, может содержать от 3-х до 16-ти знаков, включая
+            латинские буквы, буквы русского алфавита, цифры, дефис,
+            знак подчёркивания, точку и должен начинаться с латинской или
+            русской буквы. Адрес электронной почты нового пользователя
+            должен умещаться в 128 знаков, адрес должен быть уникальным и
+            незарегистрированным в сервисе.
+          </p>
+        </div>
+        <div class="form-form">
+          <form>
+            <div class="form-group">
+              <div class="form-label text-right">
+                <label for="username">Псевдоним:</label>
+              </div>
+              <div class="form-input">
+                <input class="form-control"
+                       id="username"
+                       name="username"
+                       autocomplete="new-password"
+                       placeholder="введите желаемый псевдоним"
+                       required
+                       type="text">
+              </div>
+              <div class="footer-bottom"></div>
+            </div>
+            <div class="form-group">
+              <div class="form-label text-right">
+                <label for="address">Адрес эл.почты:</label>
+              </div>
+              <div class="form-input">
+                <input class="form-control"
+                       id="address"
+                       name="address"
+                       autocomplete="new-password"
+                       placeholder="введите адрес эл.почты"
+                       required
+                       type="text">
+              </div>
+              <div class="footer-bottom"></div>
+            </div>
+            <div class="form-group">
+              <div class="form-label text-right">
+                <label for="password">Пароль:</label>
+              </div>
+              <div class="form-input">
+                <input class="form-control"
+                       id="password"
+                       name="password"
+                       autocomplete="new-password"
+                       placeholder="введите желаемый пароль"
+                       required
+                       type="password">
+              </div>
+              <div class="footer-bottom"></div>
+            </div>
+            <div class="form-group">
+              <div class="form-label text-right">
+                <label for="confirmation">Повторить:</label>
+              </div>
+              <div class="form-input">
+                <input class="form-control"
+                       id="confirmation"
+                       name="confirmation"
+                       autocomplete="new-password"
+                       placeholder="повторите пароль"
+                       required
+                       type="password">
+              </div>
+              <div class="footer-bottom"></div>
+            </div>
+            <div class="form-group">
+              <div class="form-input">
+                <button type="button"
+                        class="btn btn-primary btn-block"
+                        id="user-submit"
+                        name="user-submit">
+                  Создать пользователя
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div id="default-perms-editor" class="to-be-hidden">
+        <div class="form-help">
+          <p>
+            Здесь задаётся набор разрешений вновь регистрируемых пользователей.
+            Просто расставьте флажки в желаемом порядке в форме ниже, эти
+            разрешения будут активны у каждого вновь регистрируемого
+            пользователя.
+          </p>
+        </div>
+        <%{ perms }%>
+        <div class="form-group permission-group">
+          <button id="perm-submit"
+                  type="button"
+                  class="btn btn-primary btn-block">
+            Установить
+          </button>
+        </div>
+      </div>
+      <div id="robots-editor" class="to-be-hidden">
+        <div class="form-help">
+          <p>
+            Здесь можно создать и отредактировать файл <i>robots.txt</i>, для
+            этого следует заполнить форму ниже, вписать все необходимые
+            директивы в поле ввода и нажать кнопку "Сохранить". Имейте ввиду,
+            что файл уже существует и доступен в состоянии по-умолчанию.
+            Отменить все правки можно, удалив весть текст из формы и нажав
+            кнопку "Сохранить", тогда будет восстановлено состояние файла
+            по-умолчанию.
+          </p>
+        </div>
+        <div class="form-group ta-group">
+          <textarea id="reditor"
+                    class="form-control"
+                    placeholder="введите или отредактируйте текст файла"
+                    rows="10"><% robots %></textarea>
+        </div>
+        <div class="form-group">
+          <button id="robots-submit"
+                  type="button"
+                  class="btn btn-primary btn-block"
+                  title="сохранить">
+            Сохранить
+          </button>
+        </div>
+      </div>
+      <div id="index-editor" class="to-be-hidden">
+        <div class="form-help">
+          <p>
+            Если создать черновик и скопировать в поле ввода ниже
+            восьмизначный суффикс этого черновика, заголовок и текст черновика
+            будут показаны на стартовой странице сайта.
+          </p>
+        </div>
+        <div class="form-group ta-group">
+          <label class="sr-only" for="ipage-suffix">Суффикс:</label>
+          <input id="ipage-suffix"
+                 type="text"
+                 class="form-control"
+                 name="ipage-suffix"
+                 value="<% index %>"
+                 placeholder="введите суффикс приватной статьи">
+        </div>
+        <div class="form-group">
+          <button id="ipage-submit"
+                  type="button"
+                  class="btn btn-primary btn-block"
+                  title="задать">Задать</button>
+        </div>
+      </div>
+      <div id="li-editor" class="to-be-hidden">
+        <div class="form-help">
+          <p>
+            Здесь можно подключить на сайт счётчики статистики,
+            для этого нужно скопировать код счётчика в форму ниже и нажать
+            кнопку "Установить", счётчик будет подключен автоматически на все
+            ключевые страницы сервиса.
+          </p>
+        </div>
+        <div class="form-group ta-group">
+          <textarea id="li-edit"
+                    class="form-control"
+                    placeholder="введите или отредактируйте код счётчика"
+                    rows="10"><% li_counter %></textarea>
+        </div>
+        <div class="form-group">
+          <button id="li-submit"
+                  type="button"
+                  class="btn btn-primary btn-block">Установить</button>
+        </div>
+      </div>
+    </div>
+    <div id="options-block" class="albums-options text-center next-block">
+      <button id="create-user"
+              type="button"
+              class="btn btn-success btn-sm"
+              title="новый участник">
+        <span class="glyphicon glyphicon-user"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-perms"
+              type="button"
+              class="btn btn-primary btn-sm"
+              title="разрешения по умолчанию">
+        <span class="glyphicon glyphicon-wrench"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-robots"
+              type="button"
+              class="btn btn-success btn-sm"
+              title="править robots.txt">
+        <span class="glyphicon glyphicon-globe"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-index"
+              type="button"
+              class="btn btn-info btn-sm"
+              title="index page">
+        <span class="glyphicon glyphicon-info-sign"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-li-stat"
+              type="button"
+              class="btn btn-danger btn-sm"
+              title="счётчики статистики">
+        <span class="glyphicon glyphicon-grain"
+              aria-hidden="true"></span>
+      </button>
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/admin/tools.js',
+             'js/format-footer.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/check-browser.js',
+             'js/check-mc.js',
+             'js/ping-user.js',
+             'js/admin/tools.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

@@ -148,6 +148,12 @@
                   Webmaster <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
+                  {%- if cu['weight'] == 255 -%}
+                    <li>
+                      <a href="{{ url_for('admin:tools') }}">Инструменты</a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                  {%- endif -%}
                   <li>
                     <a href="{{ url_for('admin:logs', log='access.log') }}"
                        target="_blank">

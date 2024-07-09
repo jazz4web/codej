@@ -15,9 +15,10 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import base, static, templates, settings
 from .errors import show_error
-from .admin.views import show_log
+from .admin.views import show_log, show_tools
 from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
+from .api.admin import Admin
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import (
@@ -125,6 +126,7 @@ app = StApp(
         Route('/picture/{suffix}', show_picture, name='picture'),
         Route('/public/{slug}', show_public, name='public'),
         Mount('/admin', name='admin', routes=[
+            Route('/', show_tools, name='tools'),
             Route('/logs/{log}', show_log, name='logs')]),
         Mount('/announces', name='announces', routes=[
             Route('/', show_announces, name='announces'),
@@ -179,7 +181,8 @@ app = StApp(
             Route('/convs', Conversations, name='aconvs'),
             Route('/comment', Comment, name='acomment'),
             Route('/answer', Answer, name='aanswer'),
-            Route('/comments', Comments, name='acomments')
+            Route('/comments', Comments, name='acomments'),
+            Route('/admin-tools', Admin, name='aadmin'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),

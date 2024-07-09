@@ -4,7 +4,20 @@ from starlette.exceptions import HTTPException
 from starlette.responses import FileResponse, PlainTextResponse
 
 from ..auth.cu import getcu
+from ..common.flashed import get_flashed
 from ..common.pg import get_conn
+
+
+async def show_tools(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    await conn.close()
+    return request.app.jinja.TemplateResponse(
+        'admin/tools.html',
+        {'request': request,
+         'cu': cu,
+         'listed': True,
+         'flashed': await get_flashed(request)})
 
 
 async def show_log(request):
@@ -13,6 +26,7 @@ async def show_log(request):
         raise HTTPException(404, detail='Такой страницы у нас нет.')
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    await conn.close()
     if cu and cu.get('weight') in (250, 255):
         if l == 'access.log':
             l = f'/var/log/nginx/{l}'
