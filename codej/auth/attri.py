@@ -24,6 +24,8 @@ groups = Group(pariah="Изгои",
                keeperpro="Хранители+",
                root="Администраторы")
 defaultg = groups.blogger
+dgroups = (groups.reader, groups.commentator_, groups.commentator,
+           groups.commentatorpro, groups.blogger, groups.bloggerpro)
 kgroups = (groups.pariah, groups.reader, groups.commentator_,
            groups.commentator, groups.commentatorpro,
            groups.blogger, groups.bloggerpro)

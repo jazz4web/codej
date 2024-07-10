@@ -22,8 +22,7 @@
 {%- block templates -%}
   {{- super() -}}
   <script id="toolst" type="text/template">
-    <div class="editor-forms-block entity-block {% if flashed %}next-block
-                                                {%- endif -%}">
+    <div class="editor-forms-block entity-block">
       <div id="new-user-editor">
         <div class="form-help">
           <p>
@@ -121,7 +120,14 @@
             пользователя.
           </p>
         </div>
-        <%{ perms }%>
+        {#<%{ perms }%>#}
+        <div class="form-group">
+          <select id="select-group" class="form-control">
+            <% #groups %>
+              <option value="<% . %>"><% . %></option>
+            <% /groups %>
+          </select>
+        </div>
         <div class="form-group permission-group">
           <button id="perm-submit"
                   type="button"
@@ -253,6 +259,8 @@
              'js/check-browser.js',
              'js/check-mc.js',
              'js/ping-user.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
              'js/admin/tools.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

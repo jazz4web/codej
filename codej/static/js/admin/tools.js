@@ -31,8 +31,87 @@ $(function() {
         let html = Mustache.render($('#toolst').html(), data);
         $('#main-container').append(html);
         checkMC(860);
+        let s = $('#select-group option');
+        for (let n = 0; n < s.length; n++) {
+          if (s[n].value == data.dgroup) {
+            $(s[n]).attr('selected', 'selected');
+          }
+        }
       }
     },
     dataType: 'json'
   });
+  if (token) {
+    $('body').on('click', '#select-group', function() {
+      let res = $(this).val();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/chdgroup',
+        data: {
+          dgroup: res,
+          auth: window.localStorage.getItem('token')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#permissions', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '#edit-perms', function() {
+      $(this).blur();
+      let p = $('#default-perms-editor');
+      if (p.is(':hidden')) {
+        p.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        p.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#create-user', function() {
+      $(this).blur();
+      let p = $('#new-user-editor');
+      if (p.is(':hidden')) {
+        p.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        p.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#edit-li-stat', function() {
+      $(this).blur();
+      let l = $('#li-editor');
+      if (l.is(':hidden')) {
+        l.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        l.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#edit-index', function() {
+      $(this).blur();
+      let i = $('#index-editor');
+      if (i.is(':hidden')) {
+        i.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        i.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#edit-robots', function() {
+      $(this).blur();
+      let r = $('#robots-editor');
+      if (r.is(':hidden')) {
+        r.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        r.slideDown('slow');
+      }
+    });
+
+  }
 });

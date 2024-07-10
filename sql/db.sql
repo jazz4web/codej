@@ -168,3 +168,13 @@ CREATE TABLE commentaries (
     article_id integer REFERENCES articles(id),
     parent_id  integer REFERENCES commentaries(id)
 );
+
+CREATE TABLE settings(
+    indexpage varchar(16) DEFAULT NULL,
+    dgroup    varchar(16) DEFAULT NULL,
+    counters  text,
+    robots    text
+);
+
+INSERT INTO settings (indexpage, dgroup, counters, robots)
+  VALUES (NULL, NULL, NULL, NULL);
