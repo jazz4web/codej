@@ -42,6 +42,32 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    $('body').on('click', '#user-submit', function() {
+      $(this).blur();
+      let tee = {
+        username: $('#username').val(),
+        address: $('#address').val(),
+        password: $('#password').val(),
+        confirma: $('#confirmation').val(),
+        auth: window.localStorage.getItem('token')
+      };
+      if (tee.username && tee.address && tee.password && tee.confirma) {
+        $.ajax({
+          method: 'POST',
+          url: '/api/admin-tools',
+          data: tee,
+          success: function(data) {
+            if (data.done) {
+              window.location.assign(data.redirect);
+            } else {
+              showError('.editor-forms-block', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
     $('body').on('click', '#select-group', function() {
       let res = $(this).val();
       $.ajax({
