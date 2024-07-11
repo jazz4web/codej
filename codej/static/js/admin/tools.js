@@ -42,6 +42,26 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    $('body').on('click', '#robots-submit', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/chrobots',
+        data: {
+          auth: window.localStorage.getItem('token'),
+          value: $('#reditor').val()
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.assign('/robots.txt');
+          } else {
+            showError('.editor-forms-block', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '#user-submit', function() {
       $(this).blur();
       let tee = {

@@ -4,7 +4,7 @@ import os
 
 from starlette.exceptions import HTTPException
 from starlette.responses import (
-    FileResponse, RedirectResponse, Response)
+    FileResponse, PlainTextResponse, RedirectResponse, Response)
 
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
@@ -14,6 +14,15 @@ from ..errors import E404
 from ..pictures.attri import status
 from .pg import check_state, check_topic
 from .tools import resize
+
+
+async def show_robots(request):
+    conn = await get_conn(request.app.config)
+    text = await conn.fetchval('SELECT robots FROM settings') or \
+            request.app.jinja.get_template(
+                'main/robots.txt').render(request=request)
+    await conn.close()
+    return PlainTextResponse(text)
 
 
 async def show_sitemap(request):

@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /captcha/
+Disallow: /admin/
+Disallow: /aliases/
+Disallow: /announces/
+Disallow: /api/
+Disallow: /arts/
+Disallow: /blogs/
+Disallow: /comments/
+Disallow: /drafts/
+Disallow: /people/
+Disallow: /pictures/
+Disallow: /pm/
+
+Sitemap: {{ url_for('sitemap') }}

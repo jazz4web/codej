@@ -18,7 +18,7 @@ from .errors import show_error
 from .admin.views import show_log, show_tools
 from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
-from .api.admin import Admin, DGroup
+from .api.admin import Admin, DGroup, Robots
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import (
@@ -45,7 +45,7 @@ from .comments.views import show_comments
 from .drafts.views import show_draft, show_drafts, show_labeled
 from .main.views import (
     jump, show_avatar, show_favicon, show_index,
-    show_picture, show_public, show_sitemap)
+    show_picture, show_public, show_robots, show_sitemap)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 from .pm.views import show_conversation, show_conversations
@@ -119,6 +119,7 @@ app = StApp(
     routes=[
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
+        Route('/robots.txt', show_robots, name='robots.txt'),
         Route('/sitemap.xml', show_sitemap, name='sitemap'),
         Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
@@ -184,6 +185,7 @@ app = StApp(
             Route('/comments', Comments, name='acomments'),
             Route('/admin-tools', Admin, name='aadmin'),
             Route('/chdgroup', DGroup, name='achdgroup'),
+            Route('/chrobots', Robots, name='arobots'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),

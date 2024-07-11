@@ -12,6 +12,27 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 
 
+class Robots(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 255:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        val = d.get('value', '')
+        await conn.execute('UPDATE settings SET robots=$1', val or None)
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
 class DGroup(HTTPEndpoint):
     async def put(self, request):
         res = {'done': None}
@@ -54,6 +75,9 @@ class Admin(HTTPEndpoint):
         res['groups'] = dgroups
         res['dgroup'] = await conn.fetchval(
             'SELECT dgroup FROM settings') or defaultg
+        res['robots'] = await conn.fetchval('SELECT robots FROM settings') or \
+            request.app.jinja.get_template(
+                'main/robots.txt').render(request=request)
         await conn.close()
         return JSONResponse(res)
 
