@@ -13,7 +13,13 @@
              'css/main-container.css',
              'css/flashed-alert.css',
              'css/empty-message.css',
-             'css/today-field.css' -%}
+             'css/today-field.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/entity-text-block.css',
+             'css/pygments.css',
+             'css/next-block.css',
+             'css/index.css' -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets -%}
   <link rel="canonical" href="{{ url_for('index') }}">
@@ -21,7 +27,21 @@
 
 {%- block page_body -%}
   {%- if art -%}
-    <div id="topic"></div>
+    <div id="topic" class="content-block entity-block">
+      <h1 title="{{ art['title'] }}">
+        {{ art['title'] }}
+      </h1>
+      <div id="art-date-field" class="date-field">
+        {{ art['edited'] }}
+      </div>
+      <div class="text-block entity-text-block">
+        {{ art['html']|safe }}
+      </div>
+      <div id="admin-sign-block">
+        <img alt="avatar" src="{{ url_for(
+        'ava', username=art['author'], size=32)}}">{{ art.author}} 
+      </div>
+    </div>
   {%- else -%}
     <div id="idef"
          class="flashed-alert page-block">
@@ -44,6 +64,11 @@
              'js/ping-user.js',
              'js/logout.js',
              'js/check-incomming.js',
+             'js/format-datetime.js',
+             'js/adjust-frame.js',
+             'js/set-margin.js',
+             'js/adjust-image.js',
+             'js/click-image.js',
              'js/main/index.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

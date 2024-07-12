@@ -10,6 +10,40 @@ from ..auth.cu import checkcu
 from ..auth.pg import check_username, create_user
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
+from ..drafts.attri import status
+
+
+class IndexPage(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 255:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        val = d.get('value', '')
+        if val:
+            d = await conn.fetchval(
+                '''SELECT suffix FROM articles
+                     WHERE suffix = $1 AND author_id = $2 AND state = $3''',
+                val, cu.get('id'), status.draft)
+            if d:
+                await conn.execute('UPDATE settings SET indexpage = $1', d)
+            else:
+                res['message'] = 'Ничего не найдено по суффиксу.'
+                await conn.close()
+                return JSONResponse(res)
+        else:
+            await conn.execute('UPDATE settings SET indexpage = NULL')
+        await conn.close()
+        res['done'] = True
+        return JSONResponse(res)
 
 
 class Robots(HTTPEndpoint):
@@ -78,6 +112,7 @@ class Admin(HTTPEndpoint):
         res['robots'] = await conn.fetchval('SELECT robots FROM settings') or \
             request.app.jinja.get_template(
                 'main/robots.txt').render(request=request)
+        res['index'] = await conn.fetchval('SELECT indexpage FROM settings')
         await conn.close()
         return JSONResponse(res)
 

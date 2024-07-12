@@ -18,7 +18,7 @@ from .errors import show_error
 from .admin.views import show_log, show_tools
 from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
-from .api.admin import Admin, DGroup, Robots
+from .api.admin import Admin, DGroup, IndexPage, Robots
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import (
@@ -186,6 +186,7 @@ app = StApp(
             Route('/admin-tools', Admin, name='aadmin'),
             Route('/chdgroup', DGroup, name='achdgroup'),
             Route('/chrobots', Robots, name='arobots'),
+            Route('/chindex', IndexPage, name='aindex'),
             ]),
         Mount('/arts', name='arts', routes=[
             Route('/', show_arts, name='arts'),

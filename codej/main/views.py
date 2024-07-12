@@ -169,9 +169,9 @@ async def show_avatar(request):
 async def show_index(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
-    await conn.close()
     realm = request.query_params.get('realm')
     if realm == 'chem':
+        await conn.close()
         return request.app.jinja.TemplateResponse(
             'main/chem.html',
             {'request': request,
@@ -180,6 +180,7 @@ async def show_index(request):
              'listed': True})
     if cu is None:
         if realm == 'gpasswd':
+            await conn.close()
             return request.app.jinja.TemplateResponse(
                 'main/setpwd.html',
                 {'request': request,
@@ -188,6 +189,7 @@ async def show_index(request):
                      'REQUEST_INTERVAL', cast=int),
                  'listed': False})
         if realm == 'rpasswd':
+            await conn.close()
             return request.app.jinja.TemplateResponse(
                 'main/resetpwd.html',
                 {'request': request,
@@ -196,20 +198,37 @@ async def show_index(request):
                      'REQUEST_INTERVAL', cast=int),
                  'listed': False})
         if realm == 'reg':
+            await conn.close()
             return request.app.jinja.TemplateResponse(
                 'main/reg.html',
                 {'request': request,
                  'listed': False})
         if realm == 'login':
+            await conn.close()
             return request.app.jinja.TemplateResponse(
                 'main/login.html',
                 {'request': request,
                  'listed': False})
     logout,lall = 0, 0
+    art = await conn.fetchval('SELECT indexpage FROM settings')
+    if art:
+        art = await conn.fetchrow(
+            '''SELECT a.id, a.suffix, a.title,
+                      a.html, a.edited, u.username
+                 FROM articles AS a, users AS u
+                 WHERE a.author_id = u.id AND a.suffix = $1''', art)
+        if art:
+            art = {'id': art.get('id'),
+                   'suffix': art.get('suffix'),
+                   'title': art.get('title'),
+                   'html': art.get('html'),
+                   'edited': f'{art.get("edited").isoformat()}Z',
+                   'author': art.get('username')}
     if cu and realm == 'logoutall':
         lall = 1
     if cu and realm == 'logout':
         logout = 1
+    await conn.close()
     return request.app.jinja.TemplateResponse(
         'main/index.html',
         {'request': request,
@@ -217,6 +236,7 @@ async def show_index(request):
          'cu': cu,
          'logout': logout,
          'lall': lall,
+         'art': art,
          'listed': True})
 
 

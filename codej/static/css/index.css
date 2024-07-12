@@ -1,0 +1,26 @@
+#topic h1 {
+  font-size: 1.4em;
+  margin: 0 0 6px;
+}
+
+#art-date-field {
+  font-style: italic;
+  font-size: 0.9em;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.text-block {
+  margin: 6px 0 0;
+}
+
+#admin-sign-block {
+  font-style: italic;
+  font-size: 1.1em;
+  margin-top: 6px;
+  margin-bottom: 0;
+  text-shadow: 0 0 3px #d9dcec;
+}
+
+#admin-sign-block img {
+  margin: 0 6px 0 0;
+}
