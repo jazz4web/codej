@@ -49,6 +49,7 @@ async def show_carts(request):
 async def show_l_followed(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'arts/llenta.html',
@@ -57,12 +58,14 @@ async def show_l_followed(request):
          'page': await parse_page(request),
          'label': request.path_params.get('label'),
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 
 
 async def show_followed(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'arts/lenta.html',
@@ -70,6 +73,7 @@ async def show_followed(request):
          'page': await parse_page(request),
          'cu': cu,
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 
 
@@ -89,6 +93,7 @@ async def show_author(request):
 async def show_labeled_arts(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'arts/labeled-arts.html',
@@ -97,12 +102,14 @@ async def show_labeled_arts(request):
          'page': await parse_page(request),
          'label': request.path_params.get('label'),
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 
 
 async def show_arts(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'arts/arts.html',
@@ -110,6 +117,7 @@ async def show_arts(request):
          'cu': cu,
          'page': await parse_page(request),
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 
 
@@ -117,6 +125,7 @@ async def show_art(request):
     slug = request.path_params.get('slug')
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'arts/art.html',
@@ -124,4 +133,5 @@ async def show_art(request):
          'cu': cu,
          'slug': slug,
          'listed': False,
+         'counters': counters,
          'flashed': await get_flashed(request)})

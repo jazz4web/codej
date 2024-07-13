@@ -42,6 +42,26 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    $('body').on('click', '#li-submit', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/setcounter',
+        data: {
+          auth: window.localStorage.getItem('token'),
+          value: $('#li-edit').val()
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('.editor-forms-block', data);
+            scrollPanel($('#ealert'));
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '#ipage-submit', function() {
       $(this).blur();
       $.ajax({

@@ -48,6 +48,9 @@
     {%- endblock templates -%}
   </head>
   <body>
+    {%- if counters %}
+      <div id="counters">{{ counters|safe }}</div>
+    {%- endif -%}
     <nav id="navigation" class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-header">

@@ -7,6 +7,7 @@ from ..common.pg import get_conn
 async def show_l_blog(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'blogs/labeled.html',
@@ -16,12 +17,14 @@ async def show_l_blog(request):
          'label': request.path_params.get('label'),
          'username': request.path_params.get('username'),
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 
 
 async def show_blog(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'blogs/blog.html',
@@ -30,12 +33,14 @@ async def show_blog(request):
          'page': await parse_page(request),
          'username': request.path_params.get('username'),
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 
 
 async def show_blogs(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'blogs/authors.html',
@@ -43,5 +48,6 @@ async def show_blogs(request):
          'cu': cu,
          'page': await parse_page(request),
          'listed': True,
+         'counters': counters,
          'flashed': await get_flashed(request)})
 

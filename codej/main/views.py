@@ -49,6 +49,7 @@ async def show_public(request):
         return RedirectResponse(request.url_for('arts:art', slug=slug), 301)
     topic = dict()
     await check_topic(request, conn, slug, topic)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     if not topic:
         raise HTTPException(
@@ -57,6 +58,7 @@ async def show_public(request):
         'main/show-public.html',
         {'request': request,
          'topic': topic,
+         'counters': counters,
          'listed': False})
 
 
@@ -228,6 +230,7 @@ async def show_index(request):
         lall = 1
     if cu and realm == 'logout':
         logout = 1
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'main/index.html',
@@ -237,6 +240,7 @@ async def show_index(request):
          'logout': logout,
          'lall': lall,
          'art': art,
+         'counters': counters,
          'listed': True})
 
 

@@ -11,6 +11,10 @@ body {
   margin-bottom: 100px;
 }
 
+#counters {
+  display: none;
+}
+
 #navigation {
   margin: 2px 4px 0;
   border: 1px solid gainsboro;

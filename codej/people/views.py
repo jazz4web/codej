@@ -7,12 +7,14 @@ from ..common.pg import get_conn
 async def show_people(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    counters = await conn.fetchval('SELECT counters FROM settings')
     await conn.close()
     return request.app.jinja.TemplateResponse(
         'people/people.html',
         {'request': request,
          'cu': cu,
          'listed': True,
+         'counters': counters,
          'page': await parse_page(request),
          'flashed': await get_flashed(request)})
 

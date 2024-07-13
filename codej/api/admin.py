@@ -13,6 +13,27 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 
 
+class Counter(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if cu is None:
+            res['message'] = 'Доступ ограничен, требуется авторизация.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') < 255:
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        val = d.get('value', '')
+        await conn.execute('UPDATE settings SET counters=$1', val or None)
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
 class IndexPage(HTTPEndpoint):
     async def put(self, request):
         res = {'done': None}
@@ -113,6 +134,8 @@ class Admin(HTTPEndpoint):
             request.app.jinja.get_template(
                 'main/robots.txt').render(request=request)
         res['index'] = await conn.fetchval('SELECT indexpage FROM settings')
+        res['li_counter'] = await conn.fetchval(
+            'SELECT counters FROM settings')
         await conn.close()
         return JSONResponse(res)
 
