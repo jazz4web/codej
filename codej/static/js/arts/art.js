@@ -93,6 +93,7 @@ $(function() {
     }
   });
   if (window.localStorage.getItem('token')) {
+    checkIncomming();
     $('body').on('click', '.remove-commentary', function() {
       $(this).blur();
       let par = $(this).parents('.commentary-options');

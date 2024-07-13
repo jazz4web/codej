@@ -42,6 +42,7 @@ $(function() {
     dataType: 'json'
   });
   if (token) {
+    checkIncomming();
     $('body').on('click', '#li-submit', function() {
       $(this).blur();
       $.ajax({
